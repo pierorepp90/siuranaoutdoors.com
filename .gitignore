@@ -1,3 +1,5 @@
 .superpowers/
+.claude/
+.remember/
 .DS_Store
 Thumbs.db
