@@ -203,3 +203,16 @@ img { max-width: 100%; display: block; }
   background: repeating-linear-gradient(135deg, var(--sand), var(--sand) 10px, var(--cream) 10px, var(--cream) 20px);
 }
 .about-copy { flex: 1 1 320px; padding: 34px 32px; }
+
+.gallery { padding: 40px 0 60px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gallery-video { grid-column: span 3; min-height: 220px; border-radius: 8px; overflow: hidden; background: var(--navy); }
+.gallery-video video { width: 100%; height: 220px; display: block; max-height: 360px; object-fit: cover; }
+@media (min-width: 700px) { .gallery-video, .gallery-video video { min-height: 320px; height: 320px; } }
+.gallery-photo {
+  aspect-ratio: 1 / 1; border-radius: 8px;
+  background: repeating-linear-gradient(135deg, var(--sand), var(--sand) 10px, var(--cream) 10px, var(--cream) 20px);
+}
+@media (max-width: 700px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+}
