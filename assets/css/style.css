@@ -218,4 +218,4 @@ img { max-width: 100%; display: block; }
   .gallery-video { grid-column: span 2; }
 }
 
-.product-inner { flex-wrap: wrap-reverse; }
+.product-inner { flex-direction: row-reverse; flex-wrap: wrap-reverse; }
