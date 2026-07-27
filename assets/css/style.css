@@ -225,3 +225,10 @@ img { max-width: 100%; display: block; }
   text-align: center; padding: 24px 0; font-size: 12px;
 }
 .site-footer p { margin: 0; }
+
+@media (max-width: 600px) {
+  .header-inner { padding: 10px 16px; }
+  .hero { padding: 40px 0 44px; }
+  .logo-big { width: 100px; height: 100px; }
+  .about-copy, .product-copy { padding: 26px 20px; }
+}
