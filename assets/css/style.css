@@ -142,11 +142,15 @@ img { max-width: 100%; display: block; }
 .tipWrap { position:absolute;left:50%;top:0;transform:translateX(-50%);width:80px;height:22px;pointer-events:none; }
 .fingertip { position:absolute;top:0;width:16px;height:18px;border-radius:50%;background:var(--sand);opacity:0;
   transform-origin:top center;transition:opacity .15s ease, transform .18s cubic-bezier(.3,1.3,.4,1);transform:translateY(-12px) scale(.6); }
+.fingertip::after{content:'';position:absolute;left:50%;top:4px;width:6px;height:7px;border-radius:50%;
+  background:var(--cream);transform:translateX(-50%);opacity:.95;}
 .fingertip:nth-child(1){left:-1px;} .fingertip:nth-child(2){left:14px;} .fingertip:nth-child(3){left:29px;} .fingertip:nth-child(4){left:44px;}
 .btn-crimp:active .fingertip { opacity: 1; transform: translateY(-4px) scale(1); }
 
 .thumbtip { position:absolute;top:0;left:54px;width:16px;height:16px;border-radius:50%;background:var(--sand);opacity:0;
   transform-origin:top center;transition:opacity .15s ease, transform .18s cubic-bezier(.3,1.3,.4,1);transform:translateY(-10px) rotate(14deg) scale(.6); }
+.thumbtip::after{content:'';position:absolute;left:55%;top:3px;width:7px;height:8px;border-radius:50%;
+  background:var(--cream);transform:translateX(-50%) rotate(-16deg);opacity:.95;}
 .btn-crimp:active .thumbtip { opacity: 1; transform: translateY(-3px) rotate(-16deg) scale(1); }
 
 .puffWrap { position:absolute;z-index:2;left:50%;top:2px;transform:translateX(-50%);width:120px;height:50px;pointer-events:none; }
