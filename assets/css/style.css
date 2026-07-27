@@ -238,3 +238,7 @@ img { max-width: 100%; display: block; }
   padding: 5px 9px; border: 1px solid var(--sand); border-radius: 6px;
 }
 .lang-toggle:hover { background: var(--sand); }
+
+.stockists { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; }
+.stockists a { color: var(--sand); font-size: 11px; text-decoration: underline; }
+.stockists a:hover { color: #fff; }
