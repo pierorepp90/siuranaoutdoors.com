@@ -11,7 +11,7 @@
     wantsEnglish = pref === 'en';
   } else {
     var browserLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
-    wantsEnglish = browserLang.indexOf('es') !== 0;
+    wantsEnglish = browserLang.indexOf('en') === 0;
   }
   if (wantsEnglish && !onEnglishPage) { window.location.replace('/en/'); }
   if (!wantsEnglish && onEnglishPage) { window.location.replace('/'); }
@@ -27,7 +27,7 @@
   <div class="container header-inner">
     <img class="logo" src="/assets/img/logo.jpg" alt="Siurana Outdoors">
     <div class="header-right">
-      <a class="lang-toggle" href="/" onclick="localStorage.setItem('siuranaLang','es')">ES</a>
+      <a class="lang-toggle" href="/" onclick="localStorage.setItem('siuranaLang','es')" onmousedown="localStorage.setItem('siuranaLang','es')" lang="es" aria-label="Switch to Spanish">ES</a>
       <a class="ig-link" href="https://www.instagram.com/siuranaoutdoors" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
