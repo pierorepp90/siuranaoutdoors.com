@@ -219,3 +219,9 @@ img { max-width: 100%; display: block; }
 }
 
 .product-inner { flex-direction: row-reverse; }
+
+.site-footer {
+  background: var(--navy); color: var(--cream);
+  text-align: center; padding: 24px 0; font-size: 12px;
+}
+.site-footer p { margin: 0; }
