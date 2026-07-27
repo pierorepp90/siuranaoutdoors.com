@@ -232,3 +232,9 @@ img { max-width: 100%; display: block; }
   .logo-big { width: 100px; height: 100px; }
   .about-copy, .product-copy { padding: 26px 20px; }
 }
+
+.lang-toggle {
+  font-size: 12px; font-weight: 600; color: var(--navy); text-decoration: none;
+  padding: 5px 9px; border: 1px solid var(--sand); border-radius: 6px;
+}
+.lang-toggle:hover { background: var(--sand); }
