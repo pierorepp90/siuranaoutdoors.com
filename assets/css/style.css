@@ -42,3 +42,41 @@ img { max-width: 100%; display: block; }
 .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .facts li { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); flex-shrink: 0; }
+
+.site-header {
+  background: var(--cream);
+  border-bottom: 1px solid var(--sand);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+}
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--sand);
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ig-link {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ig-link svg {
+  width: 18px;
+  height: 18px;
+  color: var(--cream);
+}
