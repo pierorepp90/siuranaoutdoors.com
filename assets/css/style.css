@@ -80,3 +80,94 @@ img { max-width: 100%; display: block; }
   height: 18px;
   color: var(--cream);
 }
+
+.stage { position: relative; display: inline-block; }
+
+.btn-base {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  border-radius: 24px;
+  background: var(--terracotta);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  padding: 14px 30px;
+  box-shadow: 0 3px 0 var(--clay);
+  transition: box-shadow .15s ease, transform .15s ease;
+  overflow: visible;
+  font-family: 'Inter', sans-serif;
+}
+.btn-base:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--clay); }
+.btn-base:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--clay); }
+.btn-small { padding: 8px 18px; font-size: 12px; }
+
+.crimpWrap { position:absolute;z-index:0;left:50%;top:0;transform:translateX(-50%);width:80px;height:40px;pointer-events:none; }
+.finger { position:absolute;top:0;width:15px;height:32px;border-radius:7px 7px 5px 5px;background:var(--sand);opacity:0;
+  transform-origin:bottom center;transition:left .22s ease, transform .3s cubic-bezier(.3,1.3,.4,1), opacity .2s ease; }
+.finger::after { content:'';position:absolute;left:50%;bottom:7px;width:5px;height:5px;border-radius:50%;background:var(--clay);
+  transform:translateX(-50%);opacity:0;transition:opacity .18s ease; }
+
+.finger:nth-child(1){left:0px;  transform:translateY(6px) rotate(-5deg);}
+.finger:nth-child(2){left:14px; transform:translateY(6px) rotate(-1deg);}
+.finger:nth-child(3){left:28px; transform:translateY(6px) rotate(1deg);}
+.finger:nth-child(4){left:42px; transform:translateY(6px) rotate(5deg);}
+
+.btn-crimp:hover ~ .crimpWrap .finger { opacity: 1; }
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(1){transform:translateY(-18px) rotate(-5deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(2){transform:translateY(-18px) rotate(-1deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(3){transform:translateY(-18px) rotate(1deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(4){transform:translateY(-18px) rotate(5deg);}
+
+.btn-crimp:active ~ .crimpWrap .finger { transition-duration: .16s; }
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(1){left:0px;  transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(2){left:15px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(3){left:30px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(4){left:45px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger::after { opacity: .7; }
+
+.thumb { position:absolute;top:0;left:62px;width:16px;height:22px;border-radius:7px 8px 6px 6px;background:var(--sand);opacity:0;
+  transform-origin:bottom center;transition:left .22s ease, transform .3s cubic-bezier(.3,1.3,.4,1), opacity .2s ease;
+  transform:translateY(6px) rotate(10deg); }
+.thumb::after { content:'';position:absolute;left:50%;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--clay);
+  transform:translateX(-50%);opacity:0;transition:opacity .18s ease; }
+
+.btn-crimp:hover ~ .crimpWrap .thumb { opacity:1;transform:translateY(-12px) rotate(14deg); }
+.btn-crimp:active ~ .crimpWrap .thumb { left:54px;transform:translateY(-9px) rotate(-16deg) scaleY(.9);transition-duration:.16s; }
+.btn-crimp:active ~ .crimpWrap .thumb::after { opacity: .7; }
+
+.tipWrap { position:absolute;left:50%;top:0;transform:translateX(-50%);width:80px;height:22px;pointer-events:none; }
+.fingertip { position:absolute;top:0;width:16px;height:18px;border-radius:50%;background:var(--sand);opacity:0;
+  transform-origin:top center;transition:opacity .15s ease, transform .18s cubic-bezier(.3,1.3,.4,1);transform:translateY(-12px) scale(.6); }
+.fingertip:nth-child(1){left:-1px;} .fingertip:nth-child(2){left:14px;} .fingertip:nth-child(3){left:29px;} .fingertip:nth-child(4){left:44px;}
+.btn-crimp:active .fingertip { opacity: 1; transform: translateY(-4px) scale(1); }
+
+.thumbtip { position:absolute;top:0;left:54px;width:16px;height:16px;border-radius:50%;background:var(--sand);opacity:0;
+  transform-origin:top center;transition:opacity .15s ease, transform .18s cubic-bezier(.3,1.3,.4,1);transform:translateY(-10px) rotate(14deg) scale(.6); }
+.btn-crimp:active .thumbtip { opacity: 1; transform: translateY(-3px) rotate(-16deg) scale(1); }
+
+.puffWrap { position:absolute;z-index:2;left:50%;top:2px;transform:translateX(-50%);width:120px;height:50px;pointer-events:none; }
+.puff { position:absolute;border-radius:50%;background:var(--chalk);opacity:0; }
+.puff:nth-child(1){left:8px; top:20px; width:5px;height:5px;}
+.puff:nth-child(2){left:20px;top:9px;  width:6px;height:6px;}
+.puff:nth-child(3){left:32px;top:24px; width:4px;height:4px;}
+.puff:nth-child(4){left:88px;top:24px; width:4px;height:4px;}
+.puff:nth-child(5){left:100px;top:9px;  width:6px;height:6px;}
+.puff:nth-child(6){left:112px;top:20px;width:5px;height:5px;}
+
+@keyframes puffL1{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(-16px,-22px) scale(1.2);}}
+@keyframes puffL2{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(-8px,-28px) scale(1.1);}}
+@keyframes puffL3{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(-20px,-8px) scale(1.15);}}
+@keyframes puffR1{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(20px,-8px) scale(1.15);}}
+@keyframes puffR2{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(8px,-28px) scale(1.1);}}
+@keyframes puffR3{0%{opacity:0;transform:translate(0,0) scale(.5);}20%{opacity:.9;}100%{opacity:0;transform:translate(16px,-22px) scale(1.2);}}
+
+.puffWrap.puffing .puff:nth-child(1){animation:puffL1 .6s ease-out forwards;}
+.puffWrap.puffing .puff:nth-child(2){animation:puffL2 .6s ease-out .03s forwards;}
+.puffWrap.puffing .puff:nth-child(3){animation:puffL3 .6s ease-out .06s forwards;}
+.puffWrap.puffing .puff:nth-child(4){animation:puffR3 .6s ease-out .06s forwards;}
+.puffWrap.puffing .puff:nth-child(5){animation:puffR2 .6s ease-out .03s forwards;}
+.puffWrap.puffing .puff:nth-child(6){animation:puffR1 .6s ease-out forwards;}
