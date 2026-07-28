@@ -236,3 +236,18 @@ img { max-width: 100%; display: block; }
 .stockists { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; }
 .stockists a { color: var(--sand); font-size: 11px; text-decoration: underline; }
 .stockists a:hover { color: #fff; }
+
+.carousel { position: relative; overflow: hidden; }
+.carousel-slide { display: none; width: 100%; height: 100%; }
+.carousel-slide.is-active { display: block; }
+.carousel-slide img, .carousel-slide video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(38,50,63,.55); color: #fff; font-size: 18px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 1; padding: 0;
+}
+.carousel-arrow:hover { background: rgba(38,50,63,.8); }
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
