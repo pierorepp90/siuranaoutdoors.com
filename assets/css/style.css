@@ -251,3 +251,15 @@ img { max-width: 100%; display: block; }
 .carousel-arrow:hover { background: rgba(38,50,63,.8); }
 .carousel-prev { left: 10px; }
 .carousel-next { right: 10px; }
+
+.stockist-links { font-size: 12px; margin-left: 2px; }
+.stockist-links a { color: var(--clay); text-decoration: underline; }
+.stockist-links a:hover { color: var(--terracotta); }
+
+/* .about-photo has only min-height (280px), and align-items:center on its flex
+   parent means it doesn't stretch to the row height, so a height:100% child
+   (the carousel's img) can't resolve against it and falls back to the image's
+   own intrinsic aspect ratio — with these portrait product photos that produced
+   an oversized ~660px-tall box that dwarfed the copy column. Pin an explicit
+   height so the carousel crops via object-fit:cover into a balanced box instead. */
+.about-photo.carousel { height: 420px; }
