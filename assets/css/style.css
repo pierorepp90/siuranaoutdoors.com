@@ -223,14 +223,11 @@ img { max-width: 100%; display: block; }
    (520px) the box's aspect (~2.04) is actually now much closer to the video's
    1.78 than the old 320px box (~3.31) was, so on desktop the video ends up
    LESS cropped than before, not more. */
-.gallery-carousel, .gallery-carousel .carousel-slide,
-.testimonials-carousel, .testimonials-carousel .carousel-slide { height: 290px; }
+.gallery-carousel, .gallery-carousel .carousel-slide { height: 290px; }
 @media (min-width: 700px) {
-  .gallery-carousel, .gallery-carousel .carousel-slide,
-  .testimonials-carousel, .testimonials-carousel .carousel-slide { height: 520px; }
+  .gallery-carousel, .gallery-carousel .carousel-slide { height: 520px; }
 }
-.gallery-carousel, .testimonials-carousel { border-radius: 8px; background: var(--navy); }
-.testimonials-carousel { margin-top: 24px; }
+.gallery-carousel { border-radius: 8px; background: var(--navy); }
 
 /* landscape-4 and landscape-6 are portrait source photos; on desktop the
    gallery box is still wider than tall (~2.04 aspect at 520px) so cover still
@@ -262,6 +259,24 @@ img { max-width: 100%; display: block; }
 .carousel-slide img[src*="product-4"] { object-position: center 85%; }
 
 .testimonials { padding: 40px 0 60px; }
+.testimonials-grid {
+  display: grid; grid-template-columns: 1fr; gap: 32px 24px; margin-top: 32px;
+}
+@media (min-width: 700px) { .testimonials-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .testimonials-grid { grid-template-columns: repeat(3, 1fr); } }
+.testimonial-card { margin: 0; }
+/* aspect-ratio (not a fixed height) so the box scales cleanly at any card
+   width across the 1/2/3-column breakpoints above, without needing a
+   per-breakpoint height like the other carousels. 2:3 matches most of these
+   photos' own portrait aspect (~0.667) closely, so cover crops very little
+   off them; the couple of landscape/square outliers crop more on the sides,
+   checked via simulation and still framed fine at this ratio. */
+.testimonial-photo { aspect-ratio: 2 / 3; border-radius: 8px; background: var(--navy); }
+.testimonial-quote {
+  margin: 14px 0 0; font-size: 13.5px; line-height: 1.6; font-style: italic; color: var(--navy);
+}
+.testimonial-quote p { margin: 0 0 6px; }
+.testimonial-quote cite { font-size: 12.5px; font-weight: 600; font-style: normal; color: var(--clay); }
 
 .site-footer {
   background: var(--navy); color: var(--cream);
