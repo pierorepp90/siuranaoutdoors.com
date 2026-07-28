@@ -203,31 +203,63 @@ img { max-width: 100%; display: block; }
    own intrinsic aspect ratio — with these portrait product photos that produced
    an oversized ~660px-tall box that dwarfed the copy column. Pin an explicit
    height so the carousel crops via object-fit:cover into a balanced box instead.
+   540px (raised from an earlier 420px pass, which itself over-cropped these
+   mostly-portrait product photos) still sits well under that ~660px "dwarfing"
+   territory and close to the ~350-450px natural height of the .about-copy
+   text column beside it.
    This must stay ABOVE the @media (max-width:600px) block below: both rules
    share identical specificity (two classes), so the mobile override only wins
    the cascade at narrow widths if it appears later in source order. */
-.about-photo.carousel { height: 420px; }
+.about-photo.carousel { height: 540px; }
 
 .gallery { padding: 40px 0 60px; }
+/* Raised from 220/320px (mobile/desktop) to 290/520px to cut down on vertical
+   cropping of the mostly-portrait gallery photos (0.56-0.75 aspect) via
+   object-fit:cover. Side effect worth knowing: at the mobile 290px height the
+   box's aspect (~1.16) is narrower than the autoplay video's 16:9 (1.78)
+   frame, so cover now crops a bit more off the VIDEO's sides on mobile than
+   before (it was already side-cropped at 220px, just less so) — an accepted
+   tradeoff, the video's main scene stays centered and in frame. At desktop
+   (520px) the box's aspect (~2.04) is actually now much closer to the video's
+   1.78 than the old 320px box (~3.31) was, so on desktop the video ends up
+   LESS cropped than before, not more. */
 .gallery-carousel, .gallery-carousel .carousel-slide,
-.testimonials-carousel, .testimonials-carousel .carousel-slide { height: 220px; }
+.testimonials-carousel, .testimonials-carousel .carousel-slide { height: 290px; }
 @media (min-width: 700px) {
   .gallery-carousel, .gallery-carousel .carousel-slide,
-  .testimonials-carousel, .testimonials-carousel .carousel-slide { height: 320px; }
+  .testimonials-carousel, .testimonials-carousel .carousel-slide { height: 520px; }
 }
 .gallery-carousel, .testimonials-carousel { border-radius: 8px; background: var(--navy); }
 .testimonials-carousel { margin-top: 24px; }
 
-/* landscape-4 and landscape-6 are portrait source photos; the short/wide
-   carousel box crops to a thin horizontal band via object-fit:cover, and the
-   default center crop misses the climber(s) entirely. Values below were
-   picked by measuring the climbers' actual vertical position in each photo:
-   landscape-4's climber sits ~33-40% down the frame (sunset glow stays
-   in view too), landscape-6 has one climber near the top (~16-22%) and a
-   second near the bottom (~87%) — too far apart to both fit in one crop,
-   so this keeps the ascending climber (the one actually mid-route) in frame. */
+/* landscape-4 and landscape-6 are portrait source photos; on desktop the
+   gallery box is still wider than tall (~2.04 aspect at 520px) so cover still
+   crops a horizontal band off the top/bottom, and the default center crop
+   misses the climber(s) entirely. Values below were picked by measuring the
+   climbers' actual vertical position in each photo: landscape-4's climber
+   sits ~33-40% down the frame (sunset glow stays in view too), landscape-6
+   has one climber near the top (~16-22%) and a second near the bottom
+   (~87%) — too far apart to both fit in one crop, so this keeps the
+   ascending climber (the one actually mid-route) in frame. Re-checked against
+   the taller 520px/290px (desktop/mobile) box: both values still keep their
+   climber comfortably in frame, no change needed. */
 .carousel-slide img[src*="landscape-4"] { object-position: center 36%; }
 .carousel-slide img[src*="landscape-6"] { object-position: center 20%; }
+
+/* landscape-5's climbers sit in the left ~25% of this 16:9 photo. At the
+   mobile gallery height (290px) the box is narrower than the photo (aspect
+   ~1.16 vs 1.78), so cover crops the sides instead of top/bottom — a center
+   crop pushes the left edge in far enough to cut the belayer out of frame.
+   Shifting the crop left keeps every climber in frame. Desktop stays a
+   top/bottom crop (box wider than the photo) where center is already fine
+   vertically, and this X-axis shift has no effect there. */
+.carousel-slide img[src*="landscape-5"] { object-position: 10% center; }
+
+/* product-4's bag hangs low in the frame (roughly the bottom 40%, held up
+   against a rock overhang that fills the rest) — on the taller About box a
+   center crop only catches a sliver of its top edge. Shifting the crop down
+   keeps the whole bag (label, chalk window and kraft base) in frame. */
+.carousel-slide img[src*="product-4"] { object-position: center 85%; }
 
 .testimonials { padding: 40px 0 60px; }
 
@@ -247,7 +279,9 @@ img { max-width: 100%; display: block; }
   .hero { padding: 40px 0 44px; }
   .logo-big { width: 100px; height: 100px; }
   .about-copy { padding: 26px 20px; }
-  .about-photo.carousel { height: 260px; min-height: 260px; }
+  /* Raised from 260px alongside the desktop 540px bump above — same
+     less-cropping rationale, see the comment on the desktop rule. */
+  .about-photo.carousel { height: 330px; min-height: 330px; }
 }
 
 .lang-toggle {
