@@ -14,6 +14,26 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   var prev = carousel.querySelector('.carousel-prev');
   var next = carousel.querySelector('.carousel-next');
   var idx = 0;
+  var dots = [];
+  // Shared script loaded by both /index.html (lang="es") and /en/index.html
+  // (lang="en") — keep the dot label numeric-only so it reads fine either way
+  // instead of hardcoding a single language's text.
+  var dotLabel = function (n) { return 'Slide ' + (n + 1); };
+
+  if (slides.length > 1) {
+    var dotsWrap = document.createElement('div');
+    dotsWrap.className = 'carousel-dots';
+    slides.forEach(function (_, n) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot';
+      dot.setAttribute('aria-label', dotLabel(n));
+      dot.addEventListener('click', function () { show(n); });
+      dotsWrap.appendChild(dot);
+      dots.push(dot);
+    });
+    carousel.appendChild(dotsWrap);
+  }
 
   function show(i) {
     idx = (i + slides.length) % slides.length;
@@ -23,6 +43,7 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
       var video = slide.querySelector('video');
       if (video) { active ? video.play().catch(function (e) { console.warn('carousel video play failed', e); }) : video.pause(); }
     });
+    dots.forEach(function (dot, n) { dot.classList.toggle('is-active', n === idx); });
   }
 
   if (slides.length <= 1) {

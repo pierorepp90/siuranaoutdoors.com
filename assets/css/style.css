@@ -213,6 +213,17 @@ img { max-width: 100%; display: block; }
 @media (min-width: 700px) { .gallery-carousel, .gallery-carousel .carousel-slide { height: 320px; } }
 .gallery-carousel { border-radius: 8px; background: var(--navy); }
 
+/* landscape-4 and landscape-6 are portrait source photos; the short/wide
+   carousel box crops to a thin horizontal band via object-fit:cover, and the
+   default center crop misses the climber(s) entirely. Values below were
+   picked by measuring the climbers' actual vertical position in each photo:
+   landscape-4's climber sits ~33-40% down the frame (sunset glow stays
+   in view too), landscape-6 has one climber near the top (~16-22%) and a
+   second near the bottom (~87%) — too far apart to both fit in one crop,
+   so this keeps the ascending climber (the one actually mid-route) in frame. */
+.carousel-slide img[src*="landscape-4"] { object-position: center 36%; }
+.carousel-slide img[src*="landscape-6"] { object-position: center 20%; }
+
 .testimonials { padding: 40px 0 60px; }
 
 .site-footer {
@@ -254,6 +265,10 @@ img { max-width: 100%; display: block; }
 .carousel-arrow:hover { background: rgba(38,50,63,.8); }
 .carousel-prev { left: 10px; }
 .carousel-next { right: 10px; }
+
+.carousel-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 1; }
+.carousel-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.5); border: none; padding: 0; cursor: pointer; }
+.carousel-dot.is-active { background: #fff; }
 
 .stockist-links { font-size: 12px; margin-left: 2px; }
 .stockist-links a { color: var(--clay); text-decoration: underline; }
