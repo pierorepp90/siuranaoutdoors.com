@@ -191,12 +191,11 @@ img { max-width: 100%; display: block; }
   font-size: 13px; letter-spacing: .4px; color: var(--clay);
   margin: 0 0 26px; text-transform: uppercase;
 }
-.about-inner, .product-inner { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
-.about-photo, .product-photo {
+.about-inner { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+.about-photo {
   flex: 1 1 320px; min-height: 280px; border-radius: 8px;
-  background: repeating-linear-gradient(135deg, var(--sand), var(--sand) 10px, var(--cream) 10px, var(--cream) 20px);
 }
-.about-copy, .product-copy { flex: 1 1 320px; padding: 34px 32px; }
+.about-copy { flex: 1 1 320px; padding: 34px 32px; }
 
 /* .about-photo has only min-height (280px), and align-items:center on its flex
    parent means it doesn't stretch to the row height, so a height:100% child
@@ -214,7 +213,7 @@ img { max-width: 100%; display: block; }
 @media (min-width: 700px) { .gallery-carousel, .gallery-carousel .carousel-slide { height: 320px; } }
 .gallery-carousel { border-radius: 8px; background: var(--navy); }
 
-.product-inner { flex-direction: row-reverse; }
+.testimonials { padding: 40px 0 60px; }
 
 .site-footer {
   background: var(--navy); color: var(--cream);
@@ -226,7 +225,7 @@ img { max-width: 100%; display: block; }
   .header-inner { padding: 10px 16px; }
   .hero { padding: 40px 0 44px; }
   .logo-big { width: 100px; height: 100px; }
-  .about-copy, .product-copy { padding: 26px 20px; }
+  .about-copy { padding: 26px 20px; }
   .about-photo.carousel { height: 260px; min-height: 260px; }
 }
 
