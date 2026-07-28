@@ -21,7 +21,7 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
       var active = n === idx;
       slide.classList.toggle('is-active', active);
       var video = slide.querySelector('video');
-      if (video) { active ? video.play().catch(function () {}) : video.pause(); }
+      if (video) { active ? video.play().catch(function (e) { console.warn('carousel video play failed', e); }) : video.pause(); }
     });
   }
 
