@@ -227,7 +227,7 @@ img { max-width: 100%; display: block; }
      vertically centered within this row (offset ~4.5px below the padding),
      so anything less clips the raised fingers against the viewport's top
      edge on narrow screens. See commit 44aba79 for the equivalent desktop fix. */
-  .header-inner { padding: 20px 16px 10px; }
+  .header-inner { padding: 26px 16px 10px; }
   .hero { padding: 40px 0 44px; }
   .logo-big { width: 100px; height: 100px; }
   .about-copy { padding: 26px 20px; }
