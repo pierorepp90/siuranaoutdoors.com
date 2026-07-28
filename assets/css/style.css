@@ -209,9 +209,14 @@ img { max-width: 100%; display: block; }
 .about-photo.carousel { height: 420px; }
 
 .gallery { padding: 40px 0 60px; }
-.gallery-carousel, .gallery-carousel .carousel-slide { height: 220px; }
-@media (min-width: 700px) { .gallery-carousel, .gallery-carousel .carousel-slide { height: 320px; } }
-.gallery-carousel { border-radius: 8px; background: var(--navy); }
+.gallery-carousel, .gallery-carousel .carousel-slide,
+.testimonials-carousel, .testimonials-carousel .carousel-slide { height: 220px; }
+@media (min-width: 700px) {
+  .gallery-carousel, .gallery-carousel .carousel-slide,
+  .testimonials-carousel, .testimonials-carousel .carousel-slide { height: 320px; }
+}
+.gallery-carousel, .testimonials-carousel { border-radius: 8px; background: var(--navy); }
+.testimonials-carousel { margin-top: 24px; }
 
 /* landscape-4 and landscape-6 are portrait source photos; the short/wide
    carousel box crops to a thin horizontal band via object-fit:cover, and the
