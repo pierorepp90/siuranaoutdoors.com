@@ -222,7 +222,12 @@ img { max-width: 100%; display: block; }
 .site-footer p { margin: 0; }
 
 @media (max-width: 600px) {
-  .header-inner { padding: 10px 16px; }
+  /* Top padding must stay >= ~15px: the crimp-hand hover animation on the
+     header CTA rises ~18.5px above the .stage's own top edge, and .stage is
+     vertically centered within this row (offset ~4.5px below the padding),
+     so anything less clips the raised fingers against the viewport's top
+     edge on narrow screens. See commit 44aba79 for the equivalent desktop fix. */
+  .header-inner { padding: 20px 16px 10px; }
   .hero { padding: 40px 0 44px; }
   .logo-big { width: 100px; height: 100px; }
   .about-copy { padding: 26px 20px; }
