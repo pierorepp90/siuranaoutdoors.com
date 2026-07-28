@@ -103,17 +103,24 @@
 <section class="gallery">
   <div class="container">
     <h2 class="section-title" style="text-align:center;">Siurana, in images</h2>
-    <div class="gallery-grid">
-      <div class="gallery-video" aria-hidden="true">
+    <div class="carousel gallery-carousel" data-carousel aria-label="Gallery of Siurana photos and video">
+      <div class="carousel-slide is-active">
         <video autoplay muted loop playsinline poster="/assets/img/gallery-poster.jpg">
           <source src="/assets/video/siurana.mp4" type="video/mp4">
         </video>
       </div>
-      <div class="gallery-photo" aria-hidden="true"></div>
-      <div class="gallery-photo" aria-hidden="true"></div>
-      <div class="gallery-photo" aria-hidden="true"></div>
-      <div class="gallery-photo" aria-hidden="true"></div>
-      <div class="gallery-photo" aria-hidden="true"></div>
+      <div class="carousel-slide">
+        <video muted loop playsinline poster="/assets/img/gallery-poster-2.jpg">
+          <source src="/assets/video/siurana-2.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="carousel-slide">
+        <video muted loop playsinline poster="/assets/img/gallery-poster-3.jpg">
+          <source src="/assets/video/siurana-3.mp4" type="video/mp4">
+        </video>
+      </div>
+      <button class="carousel-arrow carousel-prev" aria-label="Previous">‹</button>
+      <button class="carousel-arrow carousel-next" aria-label="Next">›</button>
     </div>
   </div>
 </section>
