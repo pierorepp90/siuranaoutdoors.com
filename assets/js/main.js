@@ -11,16 +11,17 @@ document.querySelectorAll('.stage').forEach(function (stage) {
 
 // A real click on the hero CTA navigates away immediately, cutting off the
 // :active/puff animation before it can finish playing - so visitors were
-// missing it. Auto-preview it once, 3s after load, using the .js-preview /
-// .js-preview-active companion classes defined alongside the :hover/:active
-// rules in style.css.
+// missing it. Auto-preview it 3s after load, then every 30s after that for
+// as long as the page stays open, using the .js-preview/.js-preview-active
+// companion classes defined alongside the :hover/:active rules in style.css.
 (function () {
   var stage = document.querySelector('.hero .stage');
   if (!stage) return;
   var btn = stage.querySelector('.btn-crimp');
   var puffWrap = stage.querySelector('.puffWrap');
   if (!btn || !puffWrap) return;
-  window.setTimeout(function () {
+
+  function playPreview() {
     btn.classList.add('js-preview');
     window.setTimeout(function () {
       btn.classList.add('js-preview-active');
@@ -30,6 +31,11 @@ document.querySelectorAll('.stage').forEach(function (stage) {
         puffWrap.classList.remove('puffing');
       }, 1650);
     }, 500);
+  }
+
+  window.setTimeout(function () {
+    playPreview();
+    window.setInterval(playPreview, 30000);
   }, 3000);
 })();
 
