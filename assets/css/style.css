@@ -334,6 +334,8 @@ img { max-width: 100%; display: block; }
   color: var(--forest); font-size: 13.5px; font-weight: 600; margin: 14px 0 0;
   background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; padding: 12px;
 }
+.order-confirmation a { color: var(--clay); text-decoration: underline; }
+.order-confirmation a:hover { color: var(--terracotta); }
 
 .site-footer {
   background: var(--navy); color: var(--cream);

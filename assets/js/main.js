@@ -140,22 +140,32 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     return 'card';
   }
 
-  // Maps link for each pickup point, matching the hrefs on the About-section
-  // stockist links - included so the exact location comes through in the
-  // WhatsApp message, not just the point's short label. Plain-text street
-  // addresses aren't on file for Gavà/Barcelona (Raza Alimentación), only
-  // coordinates/business name, so those two use the maps link; Rocafort has
-  // a real address on file and uses that directly.
+  // One entry per pickup point: its maps link (matching the hrefs on the
+  // About-section stockist links - used to make the on-page confirmation's
+  // point name clickable) and, where we actually have one on file, a plain
+  // street address (used in the WhatsApp message text instead of the link -
+  // Gavà and Barcelona/Raza Alimentación only have coordinates/a business
+  // name on file, not a written address, so those two fall back to the link).
   var PICKUP_LOCATIONS = {
-    'Gavà': 'https://www.google.com/maps/place/41%C2%B018\'13.2%22N+2%C2%B000\'35.6%22E/@41.3036579,2.0073166,17z/data=!3m1!4b1!4m4!3m3!8m2!3d41.3036579!4d2.0098915',
-    'Barcelona': 'https://www.google.com/maps/place/Raza+Alimentaci%C3%B3n/@41.4161977,2.2108011,17z/data=!3m1!4b1!4m6!3m5!1s0x12a4a34c379c5c1b:0xa8f54bc33366c0a!8m2!3d41.4161977!4d2.2108011!16s%2Fg%2F11cns7l4rz',
-    'Barcelona (Rocafort)': 'Carrer Rocafort 165, 5-1, Barcelona, 08015'
+    'Gavà': {
+      url: 'https://www.google.com/maps/place/41%C2%B018\'13.2%22N+2%C2%B000\'35.6%22E/@41.3036579,2.0073166,17z/data=!3m1!4b1!4m4!3m3!8m2!3d41.3036579!4d2.0098915',
+      text: null
+    },
+    'Barcelona (Poble Nou)': {
+      url: 'https://www.google.com/maps/place/Raza+Alimentaci%C3%B3n/@41.4161977,2.2108011,17z/data=!3m1!4b1!4m6!3m5!1s0x12a4a34c379c5c1b:0xa8f54bc33366c0a!8m2!3d41.4161977!4d2.2108011!16s%2Fg%2F11cns7l4rz',
+      text: null
+    },
+    'Barcelona (Rocafort)': {
+      url: 'https://www.google.com/maps/search/?api=1&query=Carrer+Rocafort+165%2C+Barcelona',
+      text: 'Carrer Rocafort 165, 5-1, Barcelona, 08015'
+    }
   };
 
   function deliverySummary() {
     if (isShipping()) return (isEnglish ? 'Ship to: ' : 'Envío a: ') + addressInput.value.trim();
     var point = pickupSelect.value;
-    var exact = PICKUP_LOCATIONS[point] || point;
+    var loc = PICKUP_LOCATIONS[point];
+    var exact = (loc && (loc.text || loc.url)) || point;
     return (isEnglish ? 'Pickup at: ' : 'Recoger en: ') + point + ' - ' + exact;
   }
 
@@ -247,9 +257,16 @@ document.querySelectorAll('.stage').forEach(function (stage) {
 
     openWhatsapp(method);
     if (method === 'cash') {
-      confirmationEl.textContent = isEnglish
-        ? 'Your order is ready to pick up whenever you\'d like, at ' + pickupSelect.value + '.'
-        : 'Tu pedido está listo para recoger cuando quieras, en ' + pickupSelect.value + '.';
+      var point = pickupSelect.value;
+      var pointUrl = PICKUP_LOCATIONS[point] && PICKUP_LOCATIONS[point].url;
+      // point comes from our own fixed <select> options, never free-typed
+      // user input, so building this HTML directly is safe.
+      var pointHtml = pointUrl
+        ? '<a href="' + pointUrl + '" target="_blank" rel="noopener">' + point + '</a>'
+        : point;
+      confirmationEl.innerHTML = isEnglish
+        ? 'Your order is ready to pick up whenever you\'d like, at ' + pointHtml + '.'
+        : 'Tu pedido está listo para recoger cuando quieras, en ' + pointHtml + '.';
     } else {
       confirmationEl.textContent = isEnglish
         ? 'Order sent! We\'ll confirm Bizum payment details in the WhatsApp tab that just opened.'
