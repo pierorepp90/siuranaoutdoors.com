@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+(function () {
+  var pref = localStorage.getItem('siuranaLang');
+  var onEnglishPage = window.location.pathname.indexOf('/en/') === 0;
+  var wantsEnglish;
+  if (pref) {
+    wantsEnglish = pref === 'en';
+  } else {
+    var browserLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+    wantsEnglish = browserLang.indexOf('en') === 0;
+  }
+  if (wantsEnglish && !onEnglishPage) { window.location.replace('/en/order/'); }
+  if (!wantsEnglish && onEnglishPage) { window.location.replace('/pedido/'); }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your order — Siurana Outdoors</title>
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+<link rel="apple-touch-icon" href="/assets/img/favicon.png">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <img class="logo" src="/assets/img/logo.jpg" alt="Siurana Outdoors">
+    <div class="header-right">
+      <a class="lang-toggle" href="/pedido/" onclick="localStorage.setItem('siuranaLang','es')" onmousedown="localStorage.setItem('siuranaLang','es')" lang="es" aria-label="Switch to Spanish">ES</a>
+    </div>
+  </div>
+</header>
+
+<section class="order">
+  <div class="container">
+    <a class="back-link" href="/en/">‹ Back to the store</a>
+    <h1 class="section-title">Your order</h1>
+    <p class="body-text">Siurana Outdoors chalk bag — 250g, €8 per unit.</p>
+
+    <div class="order-qty">
+      <label for="qty">Quantity</label>
+      <div class="qty-stepper">
+        <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
+        <input type="number" id="qty" min="1" max="10" value="1" inputmode="numeric">
+        <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
+      </div>
+      <p class="order-total" aria-live="polite">Total: <strong id="order-total">€8</strong></p>
+    </div>
+
+    <div class="order-payment">
+      <h2 class="section-title" style="font-size:18px;">Payment method</h2>
+
+      <div class="payment-option">
+        <p class="body-text" style="margin-bottom:12px;">Pay securely by card through Stripe.</p>
+        <a id="stripe-link" class="btn-base btn-small" href="https://buy.stripe.com/4gM4gBcgn8Zp6pE36H4wM00">Pay by card</a>
+      </div>
+
+      <div class="payment-option">
+        <p class="body-text" style="margin-bottom:0;">Pay by Bizum: we'll confirm your order and payment details over WhatsApp.</p>
+        <label for="address">Shipping address</label>
+        <textarea id="address" rows="2" placeholder="Street, number, city, postal code"></textarea>
+        <p class="order-error" id="address-error" hidden>Please fill in your shipping address to continue.</p>
+        <button type="button" id="bizum-btn" class="btn-base btn-small" style="margin-top:12px;">Order via Bizum (WhatsApp)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2026 Siurana Outdoors</p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

@@ -101,8 +101,8 @@ img { max-width: 100%; display: block; }
   overflow: visible;
   font-family: 'Inter', sans-serif;
 }
-.btn-base:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--clay); }
-.btn-base:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--clay); }
+.btn-base:hover, .btn-base.js-preview { transform: translateY(1px); box-shadow: 0 2px 0 var(--clay); }
+.btn-base:active, .btn-base.js-preview-active { transform: translateY(2px); box-shadow: 0 1px 0 var(--clay); }
 .btn-small { padding: 8px 18px; font-size: 12px; }
 
 .crimpWrap { position:absolute;z-index:0;left:50%;top:0;transform:translateX(-50%);width:80px;height:40px;pointer-events:none; }
@@ -116,18 +116,23 @@ img { max-width: 100%; display: block; }
 .finger:nth-child(3){left:28px; transform:translateY(6px) rotate(1deg);}
 .finger:nth-child(4){left:42px; transform:translateY(6px) rotate(5deg);}
 
-.btn-crimp:hover ~ .crimpWrap .finger { opacity: 1; }
-.btn-crimp:hover ~ .crimpWrap .finger:nth-child(1){transform:translateY(-18px) rotate(-5deg);}
-.btn-crimp:hover ~ .crimpWrap .finger:nth-child(2){transform:translateY(-18px) rotate(-1deg);}
-.btn-crimp:hover ~ .crimpWrap .finger:nth-child(3){transform:translateY(-18px) rotate(1deg);}
-.btn-crimp:hover ~ .crimpWrap .finger:nth-child(4){transform:translateY(-18px) rotate(5deg);}
+/* .js-preview / .js-preview-active companion classes let JS simulate the same
+   :hover / :active look programmatically (used to auto-preview the hero
+   button 3s after page load, since a real click navigates away before the
+   :active + puff animation has time to finish playing). Keep every rule
+   below in sync if the hover/active visuals ever change. */
+.btn-crimp:hover ~ .crimpWrap .finger, .btn-crimp.js-preview ~ .crimpWrap .finger { opacity: 1; }
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(1), .btn-crimp.js-preview ~ .crimpWrap .finger:nth-child(1){transform:translateY(-18px) rotate(-5deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(2), .btn-crimp.js-preview ~ .crimpWrap .finger:nth-child(2){transform:translateY(-18px) rotate(-1deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(3), .btn-crimp.js-preview ~ .crimpWrap .finger:nth-child(3){transform:translateY(-18px) rotate(1deg);}
+.btn-crimp:hover ~ .crimpWrap .finger:nth-child(4), .btn-crimp.js-preview ~ .crimpWrap .finger:nth-child(4){transform:translateY(-18px) rotate(5deg);}
 
-.btn-crimp:active ~ .crimpWrap .finger { transition-duration: .16s; }
-.btn-crimp:active ~ .crimpWrap .finger:nth-child(1){left:0px;  transform:translateY(-14px) rotate(0deg) scaleY(.92);}
-.btn-crimp:active ~ .crimpWrap .finger:nth-child(2){left:15px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
-.btn-crimp:active ~ .crimpWrap .finger:nth-child(3){left:30px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
-.btn-crimp:active ~ .crimpWrap .finger:nth-child(4){left:45px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
-.btn-crimp:active ~ .crimpWrap .finger::after { opacity: .7; }
+.btn-crimp:active ~ .crimpWrap .finger, .btn-crimp.js-preview-active ~ .crimpWrap .finger { transition-duration: .16s; }
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(1), .btn-crimp.js-preview-active ~ .crimpWrap .finger:nth-child(1){left:0px;  transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(2), .btn-crimp.js-preview-active ~ .crimpWrap .finger:nth-child(2){left:15px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(3), .btn-crimp.js-preview-active ~ .crimpWrap .finger:nth-child(3){left:30px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger:nth-child(4), .btn-crimp.js-preview-active ~ .crimpWrap .finger:nth-child(4){left:45px; transform:translateY(-14px) rotate(0deg) scaleY(.92);}
+.btn-crimp:active ~ .crimpWrap .finger::after, .btn-crimp.js-preview-active ~ .crimpWrap .finger::after { opacity: .7; }
 
 .thumb { position:absolute;top:0;left:62px;width:16px;height:22px;border-radius:7px 8px 6px 6px;background:var(--sand);opacity:0;
   transform-origin:bottom center;transition:left .22s ease, transform .3s cubic-bezier(.3,1.3,.4,1), opacity .2s ease;
@@ -135,9 +140,9 @@ img { max-width: 100%; display: block; }
 .thumb::after { content:'';position:absolute;left:50%;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--clay);
   transform:translateX(-50%);opacity:0;transition:opacity .18s ease; }
 
-.btn-crimp:hover ~ .crimpWrap .thumb { opacity:1;transform:translateY(-12px) rotate(14deg); }
-.btn-crimp:active ~ .crimpWrap .thumb { left:54px;transform:translateY(-9px) rotate(-16deg) scaleY(.9);transition-duration:.16s; }
-.btn-crimp:active ~ .crimpWrap .thumb::after { opacity: .7; }
+.btn-crimp:hover ~ .crimpWrap .thumb, .btn-crimp.js-preview ~ .crimpWrap .thumb { opacity:1;transform:translateY(-12px) rotate(14deg); }
+.btn-crimp:active ~ .crimpWrap .thumb, .btn-crimp.js-preview-active ~ .crimpWrap .thumb { left:54px;transform:translateY(-9px) rotate(-16deg) scaleY(.9);transition-duration:.16s; }
+.btn-crimp:active ~ .crimpWrap .thumb::after, .btn-crimp.js-preview-active ~ .crimpWrap .thumb::after { opacity: .7; }
 
 .tipWrap { position:absolute;left:50%;top:0;transform:translateX(-50%);width:80px;height:22px;pointer-events:none; }
 .fingertip { position:absolute;top:0;width:16px;height:18px;border-radius:50%;background:var(--sand);opacity:0;
@@ -145,13 +150,13 @@ img { max-width: 100%; display: block; }
 .fingertip::after{content:'';position:absolute;left:50%;top:4px;width:6px;height:7px;border-radius:50%;
   background:var(--cream);transform:translateX(-50%);opacity:.95;}
 .fingertip:nth-child(1){left:-1px;} .fingertip:nth-child(2){left:14px;} .fingertip:nth-child(3){left:29px;} .fingertip:nth-child(4){left:44px;}
-.btn-crimp:active .fingertip { opacity: 1; transform: translateY(-4px) scale(1); }
+.btn-crimp:active .fingertip, .btn-crimp.js-preview-active .fingertip { opacity: 1; transform: translateY(-4px) scale(1); }
 
 .thumbtip { position:absolute;top:0;left:54px;width:16px;height:16px;border-radius:50%;background:var(--sand);opacity:0;
   transform-origin:top center;transition:opacity .15s ease, transform .18s cubic-bezier(.3,1.3,.4,1);transform:translateY(-10px) rotate(14deg) scale(.6); }
 .thumbtip::after{content:'';position:absolute;left:55%;top:3px;width:7px;height:8px;border-radius:50%;
   background:var(--cream);transform:translateX(-50%) rotate(-16deg);opacity:.95;}
-.btn-crimp:active .thumbtip { opacity: 1; transform: translateY(-3px) rotate(-16deg) scale(1); }
+.btn-crimp:active .thumbtip, .btn-crimp.js-preview-active .thumbtip { opacity: 1; transform: translateY(-3px) rotate(-16deg) scale(1); }
 
 .puffWrap { position:absolute;z-index:2;left:50%;top:2px;transform:translateX(-50%);width:120px;height:50px;pointer-events:none; }
 .puff { position:absolute;border-radius:50%;background:var(--chalk);opacity:0; }
@@ -278,6 +283,38 @@ img { max-width: 100%; display: block; }
 .testimonial-quote p { margin: 0 0 6px; }
 .testimonial-quote cite { font-size: 12.5px; font-weight: 600; font-style: normal; color: var(--clay); }
 
+.order { padding: 40px 0 60px; max-width: 460px; margin: 0 auto; }
+.back-link {
+  display: inline-block; margin-bottom: 18px; font-size: 13px; font-weight: 600;
+  color: var(--clay); text-decoration: none;
+}
+.back-link:hover { color: var(--terracotta); }
+.order-qty { margin: 20px 0 28px; }
+.order-qty label { display: block; font-size: 12.5px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+.qty-stepper { display: flex; align-items: center; gap: 10px; }
+.qty-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--sand);
+  background: var(--cream); color: var(--navy); font-size: 18px; line-height: 1;
+  cursor: pointer;
+}
+.qty-btn:hover { background: var(--sand); }
+#qty {
+  width: 56px; text-align: center; font-size: 15px; font-weight: 600; color: var(--navy);
+  border: 1px solid var(--sand); border-radius: 8px; padding: 8px 4px;
+  font-family: 'Inter', sans-serif;
+}
+.order-total { margin: 14px 0 0; font-size: 14px; }
+.order-payment { margin-top: 12px; }
+.payment-option {
+  border: 1px solid var(--sand); border-radius: 10px; padding: 18px; margin-top: 16px;
+}
+.payment-option label { display: block; font-size: 12.5px; font-weight: 600; color: var(--navy); margin: 10px 0 6px; }
+.payment-option textarea {
+  width: 100%; border: 1px solid var(--sand); border-radius: 8px; padding: 10px;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--navy); resize: vertical;
+}
+.order-error { color: var(--terracotta); font-size: 12.5px; margin: 8px 0 0; }
+
 .site-footer {
   background: var(--navy); color: var(--cream);
   text-align: center; padding: 24px 0; font-size: 12px;
@@ -285,11 +322,10 @@ img { max-width: 100%; display: block; }
 .site-footer p { margin: 0; }
 
 @media (max-width: 600px) {
-  /* Top padding must stay >= ~15px: the crimp-hand hover animation on the
-     header CTA rises ~18.5px above the .stage's own top edge, and .stage is
-     vertically centered within this row (offset ~4.5px below the padding),
-     so anything less clips the raised fingers against the viewport's top
-     edge on narrow screens. See commit 44aba79 for the equivalent desktop fix. */
+  /* This used to need >= ~15px top padding to keep the crimp-hand header CTA's
+     raised fingers from clipping against the viewport edge (see commit
+     44aba79) - that button was later removed, so the constraint no longer
+     applies, but the value still reads fine as general breathing room. */
   .header-inner { padding: 26px 16px 10px; }
   .hero { padding: 40px 0 44px; }
   .logo-big { width: 100px; height: 100px; }
