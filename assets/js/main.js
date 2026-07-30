@@ -28,7 +28,7 @@ document.querySelectorAll('.stage').forEach(function (stage) {
       window.setTimeout(function () {
         btn.classList.remove('js-preview', 'js-preview-active');
         puffWrap.classList.remove('puffing');
-      }, 650);
+      }, 1650);
     }, 500);
   }, 3000);
 })();
