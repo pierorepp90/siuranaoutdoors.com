@@ -29,7 +29,7 @@ document.querySelectorAll('.stage').forEach(function (stage) {
         btn.classList.remove('js-preview', 'js-preview-active');
         puffWrap.classList.remove('puffing');
       }, 650);
-    }, 900);
+    }, 500);
   }, 3000);
 })();
 
