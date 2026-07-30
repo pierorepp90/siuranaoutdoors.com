@@ -140,9 +140,23 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     return 'card';
   }
 
+  // Maps link for each pickup point, matching the hrefs on the About-section
+  // stockist links - included so the exact location comes through in the
+  // WhatsApp message, not just the point's short label. Plain-text street
+  // addresses aren't on file for Gavà/Barcelona (Raza Alimentación), only
+  // coordinates/business name, so those two use the maps link; Rocafort has
+  // a real address on file and uses that directly.
+  var PICKUP_LOCATIONS = {
+    'Gavà': 'https://www.google.com/maps/place/41%C2%B018\'13.2%22N+2%C2%B000\'35.6%22E/@41.3036579,2.0073166,17z/data=!3m1!4b1!4m4!3m3!8m2!3d41.3036579!4d2.0098915',
+    'Barcelona': 'https://www.google.com/maps/place/Raza+Alimentaci%C3%B3n/@41.4161977,2.2108011,17z/data=!3m1!4b1!4m6!3m5!1s0x12a4a34c379c5c1b:0xa8f54bc33366c0a!8m2!3d41.4161977!4d2.2108011!16s%2Fg%2F11cns7l4rz',
+    'Barcelona (Rocafort)': 'Carrer Rocafort 165, 5-1, Barcelona, 08015'
+  };
+
   function deliverySummary() {
     if (isShipping()) return (isEnglish ? 'Ship to: ' : 'Envío a: ') + addressInput.value.trim();
-    return (isEnglish ? 'Pickup at: ' : 'Recoger en: ') + pickupSelect.value;
+    var point = pickupSelect.value;
+    var exact = PICKUP_LOCATIONS[point] || point;
+    return (isEnglish ? 'Pickup at: ' : 'Recoger en: ') + point + ' - ' + exact;
   }
 
   // Every order - regardless of payment method - sends this same WhatsApp
