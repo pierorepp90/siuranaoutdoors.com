@@ -40,32 +40,88 @@
     <h1 class="section-title">Tu pedido</h1>
     <p class="body-text">Bolsa de magnesio Siurana Outdoors — 250g, 8€ la unidad.</p>
 
-    <div class="order-qty">
-      <label for="qty">Cantidad</label>
-      <div class="qty-stepper">
-        <button type="button" class="qty-btn" id="qty-minus" aria-label="Restar una unidad">−</button>
-        <input type="number" id="qty" min="1" max="10" value="1" inputmode="numeric">
-        <button type="button" class="qty-btn" id="qty-plus" aria-label="Sumar una unidad">+</button>
+    <form id="order-form" novalidate>
+      <div class="order-block" style="border-top:none; padding-top:0; margin-top:0;">
+        <h2 class="section-title" style="font-size:16px;">Tus datos</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="first-name">Nombre*</label>
+            <input type="text" id="first-name" required>
+          </div>
+          <div class="field">
+            <label for="last-name">Apellido*</label>
+            <input type="text" id="last-name" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="phone">Teléfono*</label>
+            <input type="tel" id="phone" required>
+          </div>
+          <div class="field">
+            <label for="email">Email*</label>
+            <input type="email" id="email" required>
+          </div>
+        </div>
       </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Cantidad</h2>
+        <div class="qty-stepper">
+          <button type="button" class="qty-btn" id="qty-minus" aria-label="Restar una unidad">−</button>
+          <input type="number" id="qty" min="1" max="10" value="1" inputmode="numeric" aria-label="Cantidad">
+          <button type="button" class="qty-btn" id="qty-plus" aria-label="Sumar una unidad">+</button>
+        </div>
+      </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Entrega</h2>
+        <label class="radio-option">
+          <input type="radio" name="delivery" id="delivery-shipping" checked>
+          Envío a domicilio <span class="fee-note">(+2,99€)</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="delivery" id="delivery-pickup">
+          Recoger en nuestros puntos de venta
+        </label>
+
+        <div class="field" id="address-field">
+          <label for="address">Dirección* (calle, número, código postal)</label>
+          <textarea id="address" rows="2" required></textarea>
+        </div>
+
+        <div class="field" id="pickup-field" hidden>
+          <label for="pickup-point">Punto de recogida*</label>
+          <select id="pickup-point">
+            <option value="">Elegí un punto</option>
+            <option value="Gavà">Gavà</option>
+            <option value="Barcelona">Barcelona</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Método de pago</h2>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-card" checked>
+          Tarjeta
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-bizum">
+          Bizum
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-cash">
+          Efectivo (retiro en tienda)
+        </label>
+      </div>
+
       <p class="order-total" aria-live="polite">Total: <strong id="order-total">8€</strong></p>
-    </div>
 
-    <div class="order-payment">
-      <h2 class="section-title" style="font-size:18px;">Método de pago</h2>
-
-      <div class="payment-option">
-        <p class="body-text" style="margin-bottom:12px;">Pagá de forma segura con tarjeta a través de Stripe.</p>
-        <a id="stripe-link" class="btn-base btn-small" href="https://buy.stripe.com/4gM4gBcgn8Zp6pE36H4wM00">Pagar con tarjeta</a>
-      </div>
-
-      <div class="payment-option">
-        <p class="body-text" style="margin-bottom:0;">Pagá por Bizum: te confirmamos el pedido y los datos para pagar por WhatsApp.</p>
-        <label for="address">Dirección de envío</label>
-        <textarea id="address" rows="2" placeholder="Calle, número, ciudad, código postal"></textarea>
-        <p class="order-error" id="address-error" hidden>Completá la dirección de envío para continuar.</p>
-        <button type="button" id="bizum-btn" class="btn-base btn-small" style="margin-top:12px;">Pedir por Bizum (WhatsApp)</button>
-      </div>
-    </div>
+      <button type="submit" class="btn-base" id="submit-order">Tramitar pedido</button>
+      <p class="order-error" id="order-error" hidden></p>
+      <p class="order-confirmation" id="order-confirmation" hidden></p>
+    </form>
   </div>
 </section>
 

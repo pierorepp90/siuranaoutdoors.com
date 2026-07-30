@@ -33,23 +33,43 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   }, 3000);
 })();
 
-// Order page only (guarded on #qty so this is a no-op on every other page
-// sharing this same script).
+// Order page only (guarded on #order-form so this is a no-op on every
+// other page sharing this same script).
 (function () {
-  var qtyInput = document.getElementById('qty');
-  if (!qtyInput) return;
+  var form = document.getElementById('order-form');
+  if (!form) return;
 
+  var isEnglish = document.documentElement.lang === 'en';
+  var unitPrice = 8;
+  var shippingFee = 2.99;
+  var whatsappNumber = '34667895438';
+  // Update this once the Cloudflare Worker is deployed (see worker/wrangler.toml).
+  var CHECKOUT_ENDPOINT = 'https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev';
+
+  var qtyInput = document.getElementById('qty');
   var qtyMinus = document.getElementById('qty-minus');
   var qtyPlus = document.getElementById('qty-plus');
   var totalEl = document.getElementById('order-total');
-  var stripeLink = document.getElementById('stripe-link');
-  var stripeBaseHref = stripeLink.getAttribute('href');
-  var bizumBtn = document.getElementById('bizum-btn');
+
+  var firstNameInput = document.getElementById('first-name');
+  var lastNameInput = document.getElementById('last-name');
+  var phoneInput = document.getElementById('phone');
+  var emailInput = document.getElementById('email');
+
+  var deliveryShipping = document.getElementById('delivery-shipping');
+  var deliveryPickup = document.getElementById('delivery-pickup');
+  var addressField = document.getElementById('address-field');
   var addressInput = document.getElementById('address');
-  var addressError = document.getElementById('address-error');
-  var unitPrice = 8;
-  var whatsappNumber = '34667895438';
-  var isEnglish = document.documentElement.lang === 'en';
+  var pickupField = document.getElementById('pickup-field');
+  var pickupSelect = document.getElementById('pickup-point');
+
+  var paymentCard = document.getElementById('payment-card');
+  var paymentBizum = document.getElementById('payment-bizum');
+  var paymentCash = document.getElementById('payment-cash');
+
+  var submitBtn = document.getElementById('submit-order');
+  var errorEl = document.getElementById('order-error');
+  var confirmationEl = document.getElementById('order-confirmation');
 
   function currentQty() {
     var n = parseInt(qtyInput.value, 10);
@@ -58,42 +78,171 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     return n;
   }
 
-  // Stripe Payment Links only honor ?quantity=N if "adjustable quantity" is
-  // turned on for that price in the Stripe dashboard - if it isn't, Stripe
-  // just ignores the param and checks out at its own default quantity, so
-  // this alone doesn't guarantee the charge matches what's shown here.
+  function isShipping() { return deliveryShipping.checked; }
+
+  function currentTotal() {
+    var total = currentQty() * unitPrice;
+    if (isShipping()) total += shippingFee;
+    return Math.round(total * 100) / 100;
+  }
+
+  function formatPrice(n) {
+    var s = (Math.round(n * 100) / 100).toString();
+    return isEnglish ? ('€' + s) : (s + '€');
+  }
+
   function updateTotal() {
-    var qty = currentQty();
-    qtyInput.value = qty;
-    totalEl.textContent = isEnglish ? ('€' + (qty * unitPrice)) : ((qty * unitPrice) + '€');
-    if (stripeLink) {
-      var sep = stripeBaseHref.indexOf('?') === -1 ? '?' : '&';
-      stripeLink.setAttribute('href', stripeBaseHref + sep + 'quantity=' + qty);
+    qtyInput.value = currentQty();
+    totalEl.textContent = formatPrice(currentTotal());
+  }
+
+  function updateDeliveryFields() {
+    if (isShipping()) {
+      addressField.hidden = false;
+      addressInput.required = true;
+      pickupField.hidden = true;
+      pickupSelect.required = false;
+    } else {
+      addressField.hidden = true;
+      addressInput.required = false;
+      pickupField.hidden = false;
+      pickupSelect.required = true;
     }
+    updateTotal();
   }
 
-  if (qtyMinus) qtyMinus.addEventListener('click', function () { qtyInput.value = currentQty() - 1; updateTotal(); });
-  if (qtyPlus) qtyPlus.addEventListener('click', function () { qtyInput.value = currentQty() + 1; updateTotal(); });
+  // Cash is pickup/in-person only - paying cash for a home delivery isn't
+  // an option, so shipping gets disabled (and forced over to pickup)
+  // whenever cash is selected, and re-enabled otherwise.
+  function updatePaymentConstraints() {
+    if (paymentCash.checked) {
+      deliveryShipping.disabled = true;
+      if (deliveryShipping.checked) deliveryPickup.checked = true;
+    } else {
+      deliveryShipping.disabled = false;
+    }
+    updateDeliveryFields();
+  }
+
+  qtyMinus.addEventListener('click', function () { qtyInput.value = currentQty() - 1; updateTotal(); });
+  qtyPlus.addEventListener('click', function () { qtyInput.value = currentQty() + 1; updateTotal(); });
   qtyInput.addEventListener('input', updateTotal);
-  updateTotal();
+  deliveryShipping.addEventListener('change', updateDeliveryFields);
+  deliveryPickup.addEventListener('change', updateDeliveryFields);
+  paymentCard.addEventListener('change', updatePaymentConstraints);
+  paymentBizum.addEventListener('change', updatePaymentConstraints);
+  paymentCash.addEventListener('change', updatePaymentConstraints);
+  updatePaymentConstraints();
 
-  if (bizumBtn) {
-    bizumBtn.addEventListener('click', function () {
-      var address = addressInput.value.trim();
-      if (!address) {
-        addressError.hidden = false;
-        addressInput.focus();
-        return;
-      }
-      addressError.hidden = true;
-      var qty = currentQty();
-      var total = qty * unitPrice;
-      var text = isEnglish
-        ? 'Hi! I want to order ' + qty + (qty === 1 ? ' bag' : ' bags') + ' of Siurana chalk (€' + total + ') and pay by Bizum. Shipping address: ' + address
-        : 'Hola! Quiero pedir ' + qty + (qty === 1 ? ' bolsa' : ' bolsas') + ' de magnesio Siurana (' + total + '€) y pagar por Bizum. Dirección de envío: ' + address;
-      window.location.href = 'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(text);
-    });
+  function currentPaymentMethod() {
+    if (paymentBizum.checked) return 'bizum';
+    if (paymentCash.checked) return 'cash';
+    return 'card';
   }
+
+  function deliverySummary() {
+    if (isShipping()) return (isEnglish ? 'Ship to: ' : 'Envío a: ') + addressInput.value.trim();
+    return (isEnglish ? 'Pickup at: ' : 'Recoger en: ') + pickupSelect.value;
+  }
+
+  // Every order - regardless of payment method - sends this same WhatsApp
+  // notification to the business, since a static Stripe Payment Link/session
+  // has no way to carry our own customer-info fields back to the owner.
+  function buildWhatsappMessage(method) {
+    var qty = currentQty();
+    var total = formatPrice(currentTotal());
+    var name = firstNameInput.value.trim() + ' ' + lastNameInput.value.trim();
+    var paymentLine = isEnglish
+      ? (method === 'bizum' ? 'Payment: Bizum (please confirm details)'
+        : method === 'cash' ? 'Payment: cash on pickup'
+        : 'Payment: card (processing via Stripe)')
+      : (method === 'bizum' ? 'Pago: Bizum (confirmar datos)'
+        : method === 'cash' ? 'Pago: efectivo al retirar'
+        : 'Pago: tarjeta (procesando por Stripe)');
+
+    var lines = isEnglish ? [
+      'New order - Siurana Outdoors',
+      'Name: ' + name,
+      'Phone: ' + phoneInput.value.trim(),
+      'Email: ' + emailInput.value.trim(),
+      'Quantity: ' + qty + (qty === 1 ? ' bag' : ' bags'),
+      deliverySummary(),
+      'Total: ' + total,
+      paymentLine
+    ] : [
+      'Nuevo pedido - Siurana Outdoors',
+      'Nombre: ' + name,
+      'Teléfono: ' + phoneInput.value.trim(),
+      'Email: ' + emailInput.value.trim(),
+      'Cantidad: ' + qty + (qty === 1 ? ' bolsa' : ' bolsas'),
+      deliverySummary(),
+      'Total: ' + total,
+      paymentLine
+    ];
+    return lines.join('\n');
+  }
+
+  function openWhatsapp(method) {
+    var text = buildWhatsappMessage(method);
+    window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errorEl.hidden = true;
+    confirmationEl.hidden = true;
+
+    if (!form.reportValidity()) return;
+
+    var method = currentPaymentMethod();
+
+    if (method === 'card') {
+      // Open WhatsApp synchronously (within the click), before the async
+      // fetch below, so popup blockers don't treat it as an unrequested popup.
+      submitBtn.disabled = true;
+      openWhatsapp('card');
+      fetch(CHECKOUT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quantity: currentQty(),
+          delivery: isShipping() ? 'shipping' : 'pickup',
+          lang: isEnglish ? 'en' : 'es'
+        })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && data.url) {
+            window.location.href = data.url;
+          } else {
+            submitBtn.disabled = false;
+            showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Probá de nuevo.');
+          }
+        })
+        .catch(function () {
+          submitBtn.disabled = false;
+          showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Probá de nuevo.');
+        });
+      return;
+    }
+
+    openWhatsapp(method);
+    if (method === 'cash') {
+      confirmationEl.textContent = isEnglish
+        ? 'Your order is ready to pick up whenever you\'d like, at ' + pickupSelect.value + '.'
+        : 'Tu pedido está listo para recoger cuando quieras, en ' + pickupSelect.value + '.';
+    } else {
+      confirmationEl.textContent = isEnglish
+        ? 'Order sent! We\'ll confirm Bizum payment details in the WhatsApp tab that just opened.'
+        : '¡Pedido enviado! Te vamos a confirmar el pago por Bizum en la pestaña de WhatsApp que se acaba de abrir.';
+    }
+    confirmationEl.hidden = false;
+  });
 })();
 
 document.querySelectorAll('[data-carousel]').forEach(function (carousel) {

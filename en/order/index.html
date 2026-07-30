@@ -40,32 +40,88 @@
     <h1 class="section-title">Your order</h1>
     <p class="body-text">Siurana Outdoors chalk bag — 250g, €8 per unit.</p>
 
-    <div class="order-qty">
-      <label for="qty">Quantity</label>
-      <div class="qty-stepper">
-        <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
-        <input type="number" id="qty" min="1" max="10" value="1" inputmode="numeric">
-        <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
+    <form id="order-form" novalidate>
+      <div class="order-block" style="border-top:none; padding-top:0; margin-top:0;">
+        <h2 class="section-title" style="font-size:16px;">Your details</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="first-name">First name*</label>
+            <input type="text" id="first-name" required>
+          </div>
+          <div class="field">
+            <label for="last-name">Last name*</label>
+            <input type="text" id="last-name" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="phone">Phone*</label>
+            <input type="tel" id="phone" required>
+          </div>
+          <div class="field">
+            <label for="email">Email*</label>
+            <input type="email" id="email" required>
+          </div>
+        </div>
       </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Quantity</h2>
+        <div class="qty-stepper">
+          <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
+          <input type="number" id="qty" min="1" max="10" value="1" inputmode="numeric" aria-label="Quantity">
+          <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Delivery</h2>
+        <label class="radio-option">
+          <input type="radio" name="delivery" id="delivery-shipping" checked>
+          Ship to my address <span class="fee-note">(+€2.99)</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="delivery" id="delivery-pickup">
+          Pick up at one of our stockists
+        </label>
+
+        <div class="field" id="address-field">
+          <label for="address">Address* (street, number, postal code)</label>
+          <textarea id="address" rows="2" required></textarea>
+        </div>
+
+        <div class="field" id="pickup-field" hidden>
+          <label for="pickup-point">Pickup point*</label>
+          <select id="pickup-point">
+            <option value="">Choose a location</option>
+            <option value="Gavà">Gavà</option>
+            <option value="Barcelona">Barcelona</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="order-block">
+        <h2 class="section-title" style="font-size:16px;">Payment method</h2>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-card" checked>
+          Card
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-bizum">
+          Bizum
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="payment" id="payment-cash">
+          Cash (in-store pickup only)
+        </label>
+      </div>
+
       <p class="order-total" aria-live="polite">Total: <strong id="order-total">€8</strong></p>
-    </div>
 
-    <div class="order-payment">
-      <h2 class="section-title" style="font-size:18px;">Payment method</h2>
-
-      <div class="payment-option">
-        <p class="body-text" style="margin-bottom:12px;">Pay securely by card through Stripe.</p>
-        <a id="stripe-link" class="btn-base btn-small" href="https://buy.stripe.com/4gM4gBcgn8Zp6pE36H4wM00">Pay by card</a>
-      </div>
-
-      <div class="payment-option">
-        <p class="body-text" style="margin-bottom:0;">Pay by Bizum: we'll confirm your order and payment details over WhatsApp.</p>
-        <label for="address">Shipping address</label>
-        <textarea id="address" rows="2" placeholder="Street, number, city, postal code"></textarea>
-        <p class="order-error" id="address-error" hidden>Please fill in your shipping address to continue.</p>
-        <button type="button" id="bizum-btn" class="btn-base btn-small" style="margin-top:12px;">Order via Bizum (WhatsApp)</button>
-      </div>
-    </div>
+      <button type="submit" class="btn-base" id="submit-order">Place order</button>
+      <p class="order-error" id="order-error" hidden></p>
+      <p class="order-confirmation" id="order-confirmation" hidden></p>
+    </form>
   </div>
 </section>
 
