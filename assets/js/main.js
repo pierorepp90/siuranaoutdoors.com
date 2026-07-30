@@ -29,13 +29,13 @@ document.querySelectorAll('.stage').forEach(function (stage) {
       window.setTimeout(function () {
         btn.classList.remove('js-preview', 'js-preview-active');
         puffWrap.classList.remove('puffing');
-      }, 1650);
+      }, 1150);
     }, 500);
   }
 
   window.setTimeout(function () {
     playPreview();
-    window.setInterval(playPreview, 30000);
+    window.setInterval(playPreview, 15000);
   }, 3000);
 })();
 
@@ -251,12 +251,12 @@ document.querySelectorAll('.stage').forEach(function (stage) {
             window.location.href = data.url;
           } else {
             submitBtn.disabled = false;
-            showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Probá de nuevo.');
+            showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
           }
         })
         .catch(function () {
           submitBtn.disabled = false;
-          showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Probá de nuevo.');
+          showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
         });
       return;
     }
