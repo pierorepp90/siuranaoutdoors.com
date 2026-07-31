@@ -232,10 +232,12 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     var method = currentPaymentMethod();
 
     if (method === 'card') {
-      // Open WhatsApp synchronously (within the click), before the async
-      // fetch below, so popup blockers don't treat it as an unrequested popup.
+      // Don't notify the business yet - the customer hasn't paid at this
+      // point, they're only about to be sent to Stripe. Stash the message
+      // and fire it from the order-success page instead, once Stripe has
+      // actually redirected back after a completed payment.
       submitBtn.disabled = true;
-      openWhatsapp('card');
+      sessionStorage.setItem('siuranaPendingWhatsapp', buildWhatsappMessage('card'));
       fetch(CHECKOUT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -250,11 +252,13 @@ document.querySelectorAll('.stage').forEach(function (stage) {
           if (data && data.url) {
             window.location.href = data.url;
           } else {
+            sessionStorage.removeItem('siuranaPendingWhatsapp');
             submitBtn.disabled = false;
             showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
           }
         })
         .catch(function () {
+          sessionStorage.removeItem('siuranaPendingWhatsapp');
           submitBtn.disabled = false;
           showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
         });
@@ -280,6 +284,29 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     }
     confirmationEl.hidden = false;
   });
+})();
+
+// Order-success page only (Stripe redirects here after a completed card
+// payment). The WhatsApp notification for a card order is deliberately
+// deferred until now instead of firing when "Tramitar pedido" was clicked,
+// so the business doesn't get pinged while the customer is still mid-payment
+// on Stripe's page - see the order-form submit handler above, which stashes
+// the message in sessionStorage right before redirecting to Stripe.
+(function () {
+  var notifyEl = document.getElementById('whatsapp-notify');
+  if (!notifyEl) return;
+  var pending = sessionStorage.getItem('siuranaPendingWhatsapp');
+  if (!pending) return;
+  sessionStorage.removeItem('siuranaPendingWhatsapp');
+
+  var url = 'https://wa.me/34667895438?text=' + encodeURIComponent(pending);
+  var link = notifyEl.querySelector('a');
+  if (link) link.setAttribute('href', url);
+  notifyEl.hidden = false;
+  // Browsers generally block a window.open() that isn't a direct result of
+  // a click, so this often won't open automatically - the visible link
+  // above is the guaranteed fallback, not an afterthought.
+  window.open(url, '_blank', 'noopener');
 })();
 
 document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
