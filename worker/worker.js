@@ -142,6 +142,9 @@ async function handleSendOrderEmails(body, env, origin) {
     + escapeHtml(deliverySummary) + '</p>'
     + bizumNoteEs
     + '<p>Muy pronto comenzaremos a preparar tu pedido y te mantendremos informado sobre el proceso. Si tienes alguna duda o necesitas ayuda, estaremos encantados de atenderte.</p>'
+    + '<p>Ante cualquier consulta o inquietud no dudes en comunicarte con nosotros vía '
+    + '<a href="mailto:' + BUSINESS_EMAIL + '" style="color:#a9542f;">email</a> o '
+    + '<a href="https://wa.me/34667895438" style="color:#a9542f;">WhatsApp</a>.</p>'
     + '<p>¡Esperamos que disfrutes tu compra!</p>'
     + '<hr style="border:none;border-top:1px solid #d8c4a0;margin:24px 0;">'
     + '<p>Thank you for your purchase!</p>'
@@ -152,6 +155,9 @@ async function handleSendOrderEmails(body, env, origin) {
     + escapeHtml(deliverySummary) + '</p>'
     + bizumNoteEn
     + "<p>We'll start preparing your order soon and will keep you posted along the way. If you have any questions or need help, we're happy to assist.</p>"
+    + '<p>If you have any questions or concerns, feel free to reach out to us via '
+    + '<a href="mailto:' + BUSINESS_EMAIL + '" style="color:#a9542f;">email</a> or '
+    + '<a href="https://wa.me/34667895438" style="color:#a9542f;">WhatsApp</a>.</p>'
     + '<p>We hope you enjoy your purchase!</p>'
     + '</div>';
 
