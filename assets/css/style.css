@@ -65,7 +65,7 @@ img { max-width: 100%; display: block; }
   align-items: center;
   gap: 14px;
 }
-.ig-link {
+.icon-link {
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -75,7 +75,7 @@ img { max-width: 100%; display: block; }
   justify-content: center;
   flex-shrink: 0;
 }
-.ig-link svg {
+.icon-link svg {
   width: 18px;
   height: 18px;
   color: var(--cream);
