@@ -113,7 +113,6 @@ async function sendResendEmail(env, payload) {
 }
 
 async function handleSendOrderEmails(body, env, origin) {
-  var lang = body.lang === 'en' ? 'en' : 'es';
   var name = String(body.name || '').slice(0, 200);
   var email = String(body.email || '').slice(0, 200);
   var phone = String(body.phone || '').slice(0, 100);
@@ -126,19 +125,35 @@ async function handleSendOrderEmails(body, env, origin) {
 
   if (!email) return jsonResponse({ error: 'Missing customer email' }, 400, origin);
 
-  var customerHtml = lang === 'en'
-    ? '<div style="font-family:sans-serif;color:#26323f;line-height:1.6;">'
-      + '<p>Thank you for your purchase!</p>'
-      + "<p>We've received and confirmed your order.</p>"
-      + "<p>We'll start preparing your order soon and will keep you posted along the way. If you have any questions or need help, we're happy to assist.</p>"
-      + '<p>We hope you enjoy your purchase!</p>'
-      + '</div>'
-    : '<div style="font-family:sans-serif;color:#26323f;line-height:1.6;">'
-      + '<p>¡Gracias por tu compra!</p>'
-      + '<p>Hemos recibido y confirmado tu pedido correctamente.</p>'
-      + '<p>Muy pronto comenzaremos a preparar tu pedido y te mantendremos informado sobre el proceso. Si tienes alguna duda o necesitas ayuda, estaremos encantados de atenderte.</p>'
-      + '<p>¡Esperamos que disfrutes tu compra!</p>'
-      + '</div>';
+  var isBizum = body.paymentMethod === 'bizum';
+  var bizumNoteEs = isBizum
+    ? '<p>Para completar el pago por Bizum, envía ' + escapeHtml(total) + ' al <strong>+34 667 89 54 38</strong>, indicando como concepto tu nombre y apellido (' + escapeHtml(name) + ').</p>'
+    : '';
+  var bizumNoteEn = isBizum
+    ? '<p>To complete payment via Bizum, please send ' + escapeHtml(total) + ' to <strong>+34 667 89 54 38</strong>, using your full name (' + escapeHtml(name) + ') as the reference.</p>'
+    : '';
+
+  var customerHtml = '<div style="font-family:sans-serif;color:#26323f;line-height:1.6;">'
+    + '<p>¡Gracias por tu compra!</p>'
+    + '<p>Hemos recibido y confirmado tu pedido correctamente.</p>'
+    + '<p>Resumen de tu pedido:<br>'
+    + 'Cantidad: ' + escapeHtml(quantity) + '<br>'
+    + 'Total: ' + escapeHtml(total) + '<br>'
+    + escapeHtml(deliverySummary) + '</p>'
+    + bizumNoteEs
+    + '<p>Muy pronto comenzaremos a preparar tu pedido y te mantendremos informado sobre el proceso. Si tienes alguna duda o necesitas ayuda, estaremos encantados de atenderte.</p>'
+    + '<p>¡Esperamos que disfrutes tu compra!</p>'
+    + '<hr style="border:none;border-top:1px solid #d8c4a0;margin:24px 0;">'
+    + '<p>Thank you for your purchase!</p>'
+    + "<p>We've received and confirmed your order.</p>"
+    + '<p>Order summary:<br>'
+    + 'Quantity: ' + escapeHtml(quantity) + '<br>'
+    + 'Total: ' + escapeHtml(total) + '<br>'
+    + escapeHtml(deliverySummary) + '</p>'
+    + bizumNoteEn
+    + "<p>We'll start preparing your order soon and will keep you posted along the way. If you have any questions or need help, we're happy to assist.</p>"
+    + '<p>We hope you enjoy your purchase!</p>'
+    + '</div>';
 
   var businessHtml = '<div style="font-family:sans-serif;color:#26323f;line-height:1.6;">'
     + '<p><strong>Nuevo pedido recibido</strong></p>'
@@ -156,7 +171,7 @@ async function handleSendOrderEmails(body, env, origin) {
       from: FROM_EMAIL,
       to: email,
       reply_to: BUSINESS_EMAIL,
-      subject: lang === 'en' ? 'Thanks for your order! - Siurana Outdoors' : '¡Gracias por tu compra! - Siurana Outdoors',
+      subject: '¡Gracias por tu compra! / Thank you for your order - Siurana Outdoors',
       html: customerHtml
     }),
     sendResendEmail(env, {
