@@ -49,8 +49,8 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   var unitPrice = 8;
   var shippingFee = 2.99;
   var whatsappNumber = '34667895438';
-  // Update this once the Cloudflare Worker is deployed (see worker/wrangler.toml).
-  var CHECKOUT_ENDPOINT = 'https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev';
+  // Cloudflare Worker that creates the Stripe Checkout Session - see worker/.
+  var CHECKOUT_ENDPOINT = 'https://siurana-checkout.siurana-checkout.workers.dev';
 
   var qtyInput = document.getElementById('qty');
   var qtyMinus = document.getElementById('qty-minus');
