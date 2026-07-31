@@ -21,7 +21,7 @@ const SHIPPING_AMOUNT_CENTS = 299; // 2.99 EUR flat shipping fee
 const BUSINESS_EMAIL = 'siuranaoutdoors@outlook.com';
 // Must be on a domain verified in Resend, or sending will fail - see the
 // setup notes given alongside this change.
-const FROM_EMAIL = 'Siurana Outdoors <pedidos@siuranaoutdoors.com>';
+const FROM_EMAIL = 'Siurana Outdoors <info@siuranaoutdoors.com>';
 
 function corsHeaders(origin) {
   var allowOrigin = ALLOWED_ORIGINS.indexOf(origin) !== -1 ? origin : ALLOWED_ORIGINS[0];
