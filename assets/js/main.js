@@ -1,3 +1,7 @@
+// Shared by the order-page and order-success IIFEs below (each is an
+// independent scope, so this needs to live outside both).
+var CHECKOUT_ENDPOINT = 'https://siurana-checkout.siurana-checkout.workers.dev';
+
 document.querySelectorAll('.stage').forEach(function (stage) {
   var btn = stage.querySelector('.btn-crimp');
   var puffWrap = stage.querySelector('.puffWrap');
@@ -49,8 +53,6 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   var unitPrice = 8;
   var shippingFee = 2.99;
   var whatsappNumber = '34667895438';
-  // Cloudflare Worker that creates the Stripe Checkout Session - see worker/.
-  var CHECKOUT_ENDPOINT = 'https://siurana-checkout.siurana-checkout.workers.dev';
 
   var qtyInput = document.getElementById('qty');
   var qtyMinus = document.getElementById('qty-minus');
@@ -217,6 +219,31 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
   }
 
+  // Same fields as the WhatsApp message, structured for the Worker's
+  // /send-order-emails endpoint (customer thank-you + business order alert
+  // via Resend). Sent best-effort - a failure here shouldn't block or alarm
+  // the customer, since WhatsApp is already the primary confirmation.
+  function orderPayload(method) {
+    return {
+      lang: isEnglish ? 'en' : 'es',
+      name: firstNameInput.value.trim() + ' ' + lastNameInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      email: emailInput.value.trim(),
+      quantity: currentQty(),
+      deliverySummary: deliverySummary(),
+      total: formatPrice(currentTotal()),
+      paymentMethod: method
+    };
+  }
+
+  function sendOrderEmails(method) {
+    fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload(method))
+    }).catch(function (e) { console.warn('order email notification failed', e); });
+  }
+
   function showError(msg) {
     errorEl.textContent = msg;
     errorEl.hidden = false;
@@ -232,12 +259,15 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     var method = currentPaymentMethod();
 
     if (method === 'card') {
-      // Don't notify the business yet - the customer hasn't paid at this
-      // point, they're only about to be sent to Stripe. Stash the message
-      // and fire it from the order-success page instead, once Stripe has
-      // actually redirected back after a completed payment.
+      // Don't notify the business (WhatsApp or email) yet - the customer
+      // hasn't paid at this point, they're only about to be sent to Stripe.
+      // Stash everything needed and fire both from the order-success page
+      // instead, once Stripe has actually redirected back after payment.
       submitBtn.disabled = true;
-      sessionStorage.setItem('siuranaPendingWhatsapp', buildWhatsappMessage('card'));
+      sessionStorage.setItem('siuranaPendingOrder', JSON.stringify({
+        whatsappText: buildWhatsappMessage('card'),
+        payload: orderPayload('card')
+      }));
       fetch(CHECKOUT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -252,13 +282,13 @@ document.querySelectorAll('.stage').forEach(function (stage) {
           if (data && data.url) {
             window.location.href = data.url;
           } else {
-            sessionStorage.removeItem('siuranaPendingWhatsapp');
+            sessionStorage.removeItem('siuranaPendingOrder');
             submitBtn.disabled = false;
             showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
           }
         })
         .catch(function () {
-          sessionStorage.removeItem('siuranaPendingWhatsapp');
+          sessionStorage.removeItem('siuranaPendingOrder');
           submitBtn.disabled = false;
           showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
         });
@@ -266,6 +296,7 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     }
 
     openWhatsapp(method);
+    sendOrderEmails(method);
     if (method === 'cash') {
       var point = pickupSelect.value;
       var pointUrl = PICKUP_LOCATIONS[point] && PICKUP_LOCATIONS[point].url;
@@ -287,19 +318,24 @@ document.querySelectorAll('.stage').forEach(function (stage) {
 })();
 
 // Order-success page only (Stripe redirects here after a completed card
-// payment). The WhatsApp notification for a card order is deliberately
-// deferred until now instead of firing when "Tramitar pedido" was clicked,
-// so the business doesn't get pinged while the customer is still mid-payment
-// on Stripe's page - see the order-form submit handler above, which stashes
-// the message in sessionStorage right before redirecting to Stripe.
+// payment). The WhatsApp/email notifications for a card order are
+// deliberately deferred until now instead of firing when "Tramitar pedido"
+// was clicked, so the business doesn't get pinged while the customer is
+// still mid-payment on Stripe's page - see the order-form submit handler
+// above, which stashes everything needed in sessionStorage right before
+// redirecting to Stripe.
 (function () {
   var notifyEl = document.getElementById('whatsapp-notify');
   if (!notifyEl) return;
-  var pending = sessionStorage.getItem('siuranaPendingWhatsapp');
-  if (!pending) return;
-  sessionStorage.removeItem('siuranaPendingWhatsapp');
+  var raw = sessionStorage.getItem('siuranaPendingOrder');
+  if (!raw) return;
+  sessionStorage.removeItem('siuranaPendingOrder');
 
-  var url = 'https://wa.me/34667895438?text=' + encodeURIComponent(pending);
+  var pending;
+  try { pending = JSON.parse(raw); } catch (e) { return; }
+  if (!pending || !pending.whatsappText) return;
+
+  var url = 'https://wa.me/34667895438?text=' + encodeURIComponent(pending.whatsappText);
   var link = notifyEl.querySelector('a');
   if (link) link.setAttribute('href', url);
   notifyEl.hidden = false;
@@ -307,6 +343,14 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   // a click, so this often won't open automatically - the visible link
   // above is the guaranteed fallback, not an afterthought.
   window.open(url, '_blank', 'noopener');
+
+  if (pending.payload) {
+    fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pending.payload)
+    }).catch(function (e) { console.warn('order email notification failed', e); });
+  }
 })();
 
 document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
