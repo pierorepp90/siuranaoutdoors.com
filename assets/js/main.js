@@ -162,10 +162,6 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     'Barcelona (Poble Nou)': {
       url: 'https://www.google.com/maps/place/Raza+Alimentaci%C3%B3n/@41.4161977,2.2108011,17z/data=!3m1!4b1!4m6!3m5!1s0x12a4a34c379c5c1b:0xa8f54bc33366c0a!8m2!3d41.4161977!4d2.2108011!16s%2Fg%2F11cns7l4rz',
       text: null
-    },
-    'Barcelona (Rocafort)': {
-      url: 'https://www.google.com/maps/search/?api=1&query=Carrer+Rocafort+165%2C+Barcelona',
-      text: 'Carrer Rocafort 165, 5-1, Barcelona, 08015'
     }
   };
 
