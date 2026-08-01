@@ -76,6 +76,7 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   var paymentCash = document.getElementById('payment-cash');
 
   var submitBtn = document.getElementById('submit-order');
+  var submitBtnDefaultText = submitBtn.textContent;
   var errorEl = document.getElementById('order-error');
   var confirmationEl = document.getElementById('order-confirmation');
 
@@ -254,12 +255,18 @@ document.querySelectorAll('.stage').forEach(function (stage) {
 
     var method = currentPaymentMethod();
 
+    // Disable immediately, for every payment method - a second click before
+    // this fires (impatience, a slow connection) would otherwise open a
+    // second WhatsApp tab / send a second email / start a second Stripe
+    // session for the same order.
+    submitBtn.disabled = true;
+    submitBtn.textContent = isEnglish ? 'Sending...' : 'Enviando...';
+
     if (method === 'card') {
       // Don't notify the business (WhatsApp or email) yet - the customer
       // hasn't paid at this point, they're only about to be sent to Stripe.
       // Stash everything needed and fire both from the order-success page
       // instead, once Stripe has actually redirected back after payment.
-      submitBtn.disabled = true;
       sessionStorage.setItem('siuranaPendingOrder', JSON.stringify({
         whatsappText: buildWhatsappMessage('card'),
         payload: orderPayload('card')
@@ -280,12 +287,14 @@ document.querySelectorAll('.stage').forEach(function (stage) {
           } else {
             sessionStorage.removeItem('siuranaPendingOrder');
             submitBtn.disabled = false;
+            submitBtn.textContent = submitBtnDefaultText;
             showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
           }
         })
         .catch(function () {
           sessionStorage.removeItem('siuranaPendingOrder');
           submitBtn.disabled = false;
+          submitBtn.textContent = submitBtnDefaultText;
           showError(isEnglish ? 'Something went wrong starting the payment. Please try again.' : 'Hubo un problema al iniciar el pago. Prueba de nuevo.');
         });
       return;
@@ -293,6 +302,10 @@ document.querySelectorAll('.stage').forEach(function (stage) {
 
     openWhatsapp(method);
     sendOrderEmails(method);
+    // Restore the label (so the button doesn't look permanently stuck on
+    // "Enviando...") but stay disabled - the confirmation message below is
+    // the intended next step, not a second submission of the same order.
+    submitBtn.textContent = submitBtnDefaultText;
     if (method === 'cash') {
       var point = pickupSelect.value;
       var pointUrl = PICKUP_LOCATIONS[point] && PICKUP_LOCATIONS[point].url;
