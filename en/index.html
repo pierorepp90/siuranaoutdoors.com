@@ -3,22 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <script>
+// Only an explicit ES/EN choice (stored by the language toggle) redirects.
+// Guessing from the browser language is what Google asks sites not to do:
+// Googlebot crawls without Accept-Language and mostly from the US, so it
+// would be bounced off the Spanish pages. First-time visitors whose browser
+// is in the other language get a suggestion bar instead (main.js).
 (function () {
-  var pref = localStorage.getItem('siuranaLang');
+  var pref = null;
+  try { pref = localStorage.getItem('siuranaLang'); } catch (e) {}
   var onEnglishPage = window.location.pathname.indexOf('/en/') === 0;
-  var wantsEnglish;
-  if (pref) {
-    wantsEnglish = pref === 'en';
-  } else {
-    var browserLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
-    wantsEnglish = browserLang.indexOf('en') === 0;
-  }
-  if (wantsEnglish && !onEnglishPage) { window.location.replace('/en/'); }
-  if (!wantsEnglish && onEnglishPage) { window.location.replace('/'); }
+  if (pref === 'en' && !onEnglishPage) { window.location.replace('/en/'); }
+  if (pref === 'es' && onEnglishPage) { window.location.replace('/'); }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Siurana Outdoors — Climbing Chalk</title>
+<title>Climbing Chalk in Barcelona · 250 g Bag | Siurana Outdoors</title>
+<meta name="description" content="Fine climbing chalk, 100% magnesium carbonate. 250 g bag for €8: home delivery for €2.99 or free pickup in Barcelona or Gavà.">
+<link rel="canonical" href="https://siuranaoutdoors.com/en/">
+<link rel="alternate" hreflang="es" href="https://siuranaoutdoors.com/">
+<link rel="alternate" hreflang="en" href="https://siuranaoutdoors.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://siuranaoutdoors.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Siurana Outdoors">
+<meta property="og:title" content="Climbing Chalk in Barcelona · 250 g Bag | Siurana Outdoors">
+<meta property="og:description" content="Fine climbing chalk, 100% magnesium carbonate. 250 g bag for €8: home delivery for €2.99 or free pickup in Barcelona or Gavà.">
+<meta property="og:url" content="https://siuranaoutdoors.com/en/">
+<meta property="og:image" content="https://siuranaoutdoors.com/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f6efe1">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://siuranaoutdoors.com/#org",
+   "name": "Siurana Outdoors",
+   "url": "https://siuranaoutdoors.com/",
+   "logo": "https://siuranaoutdoors.com/assets/img/logo.jpg",
+   "email": "siuranaoutdoors@outlook.com",
+   "telephone": "+34667895438",
+   "sameAs": [
+    "https://www.instagram.com/siuranaoutdoors"
+   ]
+  },
+  {
+   "@type": "Product",
+   "@id": "https://siuranaoutdoors.com/en/#magnesio-250g",
+   "sku": "magnesio-250g",
+   "name": "Siurana Outdoors climbing chalk 250 g",
+   "description": "Fine loose climbing chalk, 100% magnesium carbonate. 250 g kraft paper doypack with zip closure.",
+   "image": [
+    "https://siuranaoutdoors.com/assets/img/product/product-1.jpg",
+    "https://siuranaoutdoors.com/assets/img/product/product-2.jpg",
+    "https://siuranaoutdoors.com/assets/img/product/product-3.jpg"
+   ],
+   "brand": {
+    "@type": "Brand",
+    "name": "Siurana Outdoors"
+   },
+   "offers": {
+    "@type": "Offer",
+    "url": "https://siuranaoutdoors.com/en/",
+    "price": "8.00",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "seller": {
+     "@id": "https://siuranaoutdoors.com/#org"
+    },
+    "shippingDetails": {
+     "@type": "OfferShippingDetails",
+     "shippingRate": {
+      "@type": "MonetaryAmount",
+      "value": "2.99",
+      "currency": "EUR"
+     },
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "addressCountry": "ES"
+     }
+    }
+   }
+  }
+ ]
+}
+</script>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
 <link rel="apple-touch-icon" href="/assets/img/favicon.png">
 <link rel="stylesheet" href="/assets/css/style.css">
@@ -102,7 +175,7 @@
     <h2 class="section-title" style="text-align:center;">Siurana, in images</h2>
     <div class="carousel gallery-carousel" data-carousel aria-label="Gallery of Siurana photos and video">
       <div class="carousel-slide is-active">
-        <video autoplay muted loop playsinline poster="/assets/img/gallery-poster.jpg">
+        <video muted loop playsinline preload="none" poster="/assets/img/gallery-poster.jpg">
           <source src="/assets/video/siurana.mp4" type="video/mp4">
         </video>
       </div>
@@ -227,6 +300,7 @@
   </div>
 </footer>
 
+<script src="/assets/js/meta.js"></script>
 <script src="/assets/js/main.js"></script>
 </body>
 </html>

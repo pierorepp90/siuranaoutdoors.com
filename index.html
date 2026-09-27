@@ -3,22 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <script>
+// Only an explicit ES/EN choice (stored by the language toggle) redirects.
+// Guessing from the browser language is what Google asks sites not to do:
+// Googlebot crawls without Accept-Language and mostly from the US, so it
+// would be bounced off the Spanish pages. First-time visitors whose browser
+// is in the other language get a suggestion bar instead (main.js).
 (function () {
-  var pref = localStorage.getItem('siuranaLang');
+  var pref = null;
+  try { pref = localStorage.getItem('siuranaLang'); } catch (e) {}
   var onEnglishPage = window.location.pathname.indexOf('/en/') === 0;
-  var wantsEnglish;
-  if (pref) {
-    wantsEnglish = pref === 'en';
-  } else {
-    var browserLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
-    wantsEnglish = browserLang.indexOf('en') === 0;
-  }
-  if (wantsEnglish && !onEnglishPage) { window.location.replace('/en/'); }
-  if (!wantsEnglish && onEnglishPage) { window.location.replace('/'); }
+  if (pref === 'en' && !onEnglishPage) { window.location.replace('/en/'); }
+  if (pref === 'es' && onEnglishPage) { window.location.replace('/'); }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Siurana Outdoors — Magnesio de escalada</title>
+<title>Magnesio de escalada 250 g en Barcelona | Siurana Outdoors</title>
+<meta name="description" content="Magnesio de escalada en polvo, 100 % carbonato y grano fino. Bolsa de 250 g a 8 €: envío a domicilio por 2,99 € o recógelo gratis en Barcelona o Gavà.">
+<link rel="canonical" href="https://siuranaoutdoors.com/">
+<link rel="alternate" hreflang="es" href="https://siuranaoutdoors.com/">
+<link rel="alternate" hreflang="en" href="https://siuranaoutdoors.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://siuranaoutdoors.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Siurana Outdoors">
+<meta property="og:title" content="Magnesio de escalada 250 g en Barcelona | Siurana Outdoors">
+<meta property="og:description" content="Magnesio de escalada en polvo, 100 % carbonato y grano fino. Bolsa de 250 g a 8 €: envío a domicilio por 2,99 € o recógelo gratis en Barcelona o Gavà.">
+<meta property="og:url" content="https://siuranaoutdoors.com/">
+<meta property="og:image" content="https://siuranaoutdoors.com/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f6efe1">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://siuranaoutdoors.com/#org",
+   "name": "Siurana Outdoors",
+   "url": "https://siuranaoutdoors.com/",
+   "logo": "https://siuranaoutdoors.com/assets/img/logo.jpg",
+   "email": "siuranaoutdoors@outlook.com",
+   "telephone": "+34667895438",
+   "sameAs": [
+    "https://www.instagram.com/siuranaoutdoors"
+   ]
+  },
+  {
+   "@type": "Product",
+   "@id": "https://siuranaoutdoors.com/#magnesio-250g",
+   "sku": "magnesio-250g",
+   "name": "Magnesio de escalada Siurana Outdoors 250 g",
+   "description": "Magnesio de escalada en polvo, 100 % carbonato de magnesio, grano fino. Bolsa doypack de papel kraft de 250 g con cierre zip.",
+   "image": [
+    "https://siuranaoutdoors.com/assets/img/product/product-1.jpg",
+    "https://siuranaoutdoors.com/assets/img/product/product-2.jpg",
+    "https://siuranaoutdoors.com/assets/img/product/product-3.jpg"
+   ],
+   "brand": {
+    "@type": "Brand",
+    "name": "Siurana Outdoors"
+   },
+   "offers": {
+    "@type": "Offer",
+    "url": "https://siuranaoutdoors.com/",
+    "price": "8.00",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "seller": {
+     "@id": "https://siuranaoutdoors.com/#org"
+    },
+    "shippingDetails": {
+     "@type": "OfferShippingDetails",
+     "shippingRate": {
+      "@type": "MonetaryAmount",
+      "value": "2.99",
+      "currency": "EUR"
+     },
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "addressCountry": "ES"
+     }
+    }
+   }
+  }
+ ]
+}
+</script>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
 <link rel="apple-touch-icon" href="/assets/img/favicon.png">
 <link rel="stylesheet" href="/assets/css/style.css">
@@ -85,7 +158,7 @@
         Siurana es uno de los sectores de escalada más exigentes de Cataluña — muros de caliza donde cada regleta cuenta. De ahí nace nuestro magnesio: grano muy fino, pensado para una absorción rápida en los momentos donde no hay margen de error.
       </p>
       <p class="body-text">
-        Bolsa de 250grms, en DoyPack de papel Kraft con cierre estilo Zip. Es 100% Carbonato de magnesio aprobado para uso deportivo y conforme a la normativa de la Unión Europea.
+        Bolsa de 250 g, en DoyPack de papel Kraft con cierre estilo Zip. Es 100% Carbonato de magnesio aprobado para uso deportivo y conforme a la normativa de la Unión Europea.
       </p>
       <ul class="facts">
         <li><span class="dot"></span> Grano fino · absorción rápida</li>
@@ -99,7 +172,7 @@
     <h2 class="section-title" style="text-align:center;">Siurana, en imágenes</h2>
     <div class="carousel gallery-carousel" data-carousel aria-label="Galería de fotos y video de Siurana">
       <div class="carousel-slide is-active">
-        <video autoplay muted loop playsinline poster="/assets/img/gallery-poster.jpg">
+        <video muted loop playsinline preload="none" poster="/assets/img/gallery-poster.jpg">
           <source src="/assets/video/siurana.mp4" type="video/mp4">
         </video>
       </div>
@@ -222,6 +295,7 @@
   </div>
 </footer>
 
+<script src="/assets/js/meta.js"></script>
 <script src="/assets/js/main.js"></script>
 </body>
 </html>

@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <script>
+// Only an explicit ES/EN choice (stored by the language toggle) redirects.
+// Guessing from the browser language is what Google asks sites not to do:
+// Googlebot crawls without Accept-Language and mostly from the US, so it
+// would be bounced off the Spanish pages. First-time visitors whose browser
+// is in the other language get a suggestion bar instead (main.js).
 (function () {
-  var pref = localStorage.getItem('siuranaLang');
+  var pref = null;
+  try { pref = localStorage.getItem('siuranaLang'); } catch (e) {}
   var onEnglishPage = window.location.pathname.indexOf('/en/') === 0;
-  var wantsEnglish;
-  if (pref) {
-    wantsEnglish = pref === 'en';
-  } else {
-    var browserLang = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
-    wantsEnglish = browserLang.indexOf('en') === 0;
-  }
-  if (wantsEnglish && !onEnglishPage) { window.location.replace('/en/order/'); }
-  if (!wantsEnglish && onEnglishPage) { window.location.replace('/pedido/'); }
+  if (pref === 'en' && !onEnglishPage) { window.location.replace('/en/order/'); }
+  if (pref === 'es' && onEnglishPage) { window.location.replace('/pedido/'); }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
 <title>Tu pedido — Siurana Outdoors</title>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
 <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -131,6 +131,7 @@
   </div>
 </footer>
 
+<script src="/assets/js/meta.js"></script>
 <script src="/assets/js/main.js"></script>
 </body>
 </html>
