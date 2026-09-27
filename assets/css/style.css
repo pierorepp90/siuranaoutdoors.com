@@ -295,6 +295,9 @@ img { max-width: 100%; display: block; }
 .field-row .field { flex: 1 1 0; min-width: 0; }
 .field { margin-top: 12px; }
 .field:first-child { margin-top: 0; }
+/* Side-by-side fields share one top edge; the spacing goes between rows. */
+.field-row .field { margin-top: 0; }
+.field-row + .field-row { margin-top: 12px; }
 .field label {
   display: block; font-size: 12.5px; font-weight: 600; color: var(--navy); margin-bottom: 6px;
 }
