@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://siuranaoutdoors.com/sitemap.xml

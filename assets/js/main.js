@@ -43,6 +43,58 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   }, 3000);
 })();
 
+// Meta events (see assets/js/meta.js - they only reach Meta once a pixel ID
+// is set there and the visitor accepted cookies).
+var meta = window.siuranaMeta;
+
+// The home page is the product page.
+if (meta && document.querySelector('.hero .stage')) {
+  meta.track('ViewContent', meta.productParams(1));
+}
+
+// Header WhatsApp / email icons.
+document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
+  var href = link.getAttribute('href') || '';
+  var channel = href.indexOf('wa.me') !== -1 ? 'whatsapp' : href.indexOf('mailto:') === 0 ? 'email' : null;
+  if (!channel || !meta) return;
+  link.addEventListener('click', function () { meta.track('Contact', { channel: channel }); });
+});
+
+// Only an explicit choice (the ES/EN toggle) redirects - see the inline
+// script in each page's <head>. A first-time visitor whose browser is in the
+// other language gets this suggestion bar instead of an automatic redirect.
+(function () {
+  var toggle = document.querySelector('.lang-toggle');
+  if (!toggle) return;
+  var pref = null;
+  try { pref = localStorage.getItem('siuranaLang'); } catch (e) {}
+  if (pref) return;
+  var pageLang = document.documentElement.lang === 'en' ? 'en' : 'es';
+  var browserLang = (navigator.language || 'es').toLowerCase().indexOf('en') === 0 ? 'en' : 'es';
+  if (browserLang === pageLang) return;
+
+  function remember(lang) { try { localStorage.setItem('siuranaLang', lang); } catch (e) {} }
+
+  var bar = document.createElement('div');
+  bar.className = 'lang-suggest';
+  bar.setAttribute('lang', browserLang);
+  var link = document.createElement('a');
+  link.href = toggle.getAttribute('href');
+  link.textContent = browserLang === 'en' ? 'View in English' : 'Ver en castellano';
+  link.addEventListener('click', function () { remember(browserLang); });
+  var text = document.createElement('span');
+  text.textContent = browserLang === 'en' ? 'This page is also available in English. ' : 'Esta página también está en castellano. ';
+  var close = document.createElement('button');
+  close.type = 'button';
+  close.setAttribute('aria-label', browserLang === 'en' ? 'Close' : 'Cerrar');
+  close.textContent = '×';
+  close.addEventListener('click', function () { remember(pageLang); bar.remove(); });
+  text.appendChild(link);
+  bar.appendChild(text);
+  bar.appendChild(close);
+  document.body.insertBefore(bar, document.body.firstChild);
+})();
+
 // Order page only (guarded on #order-form so this is a no-op on every
 // other page sharing this same script).
 (function () {
@@ -143,6 +195,23 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   paymentCash.addEventListener('change', updatePaymentConstraints);
   updatePaymentConstraints();
 
+  if (meta) meta.track('InitiateCheckout', meta.productParams(1));
+
+  // Shared by the Meta Purchase event (as its eventID) and the order payload,
+  // so a future server-side copy of the same purchase can carry the same id.
+  function newOrderId() {
+    return 'SO-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+  }
+
+  function buyer() {
+    return {
+      email: emailInput.value,
+      phone: phoneInput.value,
+      firstName: firstNameInput.value,
+      lastName: lastNameInput.value
+    };
+  }
+
   function currentPaymentMethod() {
     if (paymentBizum.checked) return 'bizum';
     if (paymentCash.checked) return 'cash';
@@ -220,8 +289,9 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   // /send-order-emails endpoint (customer thank-you + business order alert
   // via Resend). Sent best-effort - a failure here shouldn't block or alarm
   // the customer, since WhatsApp is already the primary confirmation.
-  function orderPayload(method) {
+  function orderPayload(method, orderId) {
     return {
+      orderId: orderId,
       lang: isEnglish ? 'en' : 'es',
       name: firstNameInput.value.trim() + ' ' + lastNameInput.value.trim(),
       phone: phoneInput.value.trim(),
@@ -233,11 +303,11 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     };
   }
 
-  function sendOrderEmails(method) {
+  function sendOrderEmails(method, orderId) {
     fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderPayload(method))
+      body: JSON.stringify(orderPayload(method, orderId))
     }).catch(function (e) { console.warn('order email notification failed', e); });
   }
 
@@ -254,6 +324,15 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     if (!form.reportValidity()) return;
 
     var method = currentPaymentMethod();
+    var orderId = newOrderId();
+    var metaParams = meta && meta.productParams(currentQty(), {
+      payment_method: method,
+      delivery: isShipping() ? 'shipping' : 'pickup'
+    });
+    if (meta) {
+      meta.identify(buyer());
+      meta.track('AddPaymentInfo', metaParams);
+    }
 
     // Disable immediately, for every payment method - a second click before
     // this fires (impatience, a slow connection) would otherwise open a
@@ -269,7 +348,8 @@ document.querySelectorAll('.stage').forEach(function (stage) {
       // instead, once Stripe has actually redirected back after payment.
       sessionStorage.setItem('siuranaPendingOrder', JSON.stringify({
         whatsappText: buildWhatsappMessage('card'),
-        payload: orderPayload('card')
+        payload: orderPayload('card', orderId),
+        meta: { params: metaParams, buyer: buyer() }
       }));
       fetch(CHECKOUT_ENDPOINT, {
         method: 'POST',
@@ -301,7 +381,11 @@ document.querySelectorAll('.stage').forEach(function (stage) {
     }
 
     openWhatsapp(method);
-    sendOrderEmails(method);
+    sendOrderEmails(method, orderId);
+    // Bizum and cash orders count as a purchase when placed (the money
+    // arrives later, by hand); payment_method keeps them apart from card
+    // sales in Meta's reports.
+    if (meta) meta.track('Purchase', metaParams, 'order-' + orderId);
     // Restore the label (so the button doesn't look permanently stuck on
     // "Enviando...") but stay disabled - the confirmation message below is
     // the intended next step, not a second submission of the same order.
@@ -353,6 +437,17 @@ document.querySelectorAll('.stage').forEach(function (stage) {
   // above is the guaranteed fallback, not an afterthought.
   window.open(url, '_blank', 'noopener');
 
+  // Card purchase. Fires only here, off the one-shot pending order, so a
+  // reload or a direct visit to this page never counts a second sale. The
+  // Stripe session id is the eventID a future server-side copy (a Stripe
+  // webhook) would also know, so Meta can keep just one of the two.
+  if (pending.meta && meta) {
+    var sessionId = new URLSearchParams(window.location.search).get('session_id');
+    var eventId = sessionId ? 'stripe-' + sessionId : 'order-' + (pending.payload && pending.payload.orderId);
+    meta.identify(pending.meta.buyer || {});
+    meta.track('Purchase', pending.meta.params, eventId);
+  }
+
   if (pending.payload) {
     fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
       method: 'POST',
@@ -368,6 +463,12 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   var next = carousel.querySelector('.carousel-next');
   var idx = 0;
   var dots = [];
+  // Videos only play (and so only download) while the carousel is on
+  // screen - the gallery sits far below the fold, and letting its first
+  // video autoplay on load spent ~2MB of a phone's bandwidth before the
+  // visitor ever scrolled there.
+  var hasVideo = !!carousel.querySelector('video');
+  var onScreen = !hasVideo || !('IntersectionObserver' in window);
   // Shared script loaded by both /index.html (lang="es") and /en/index.html
   // (lang="en") — keep the dot label numeric-only so it reads fine either way
   // instead of hardcoding a single language's text.
@@ -394,7 +495,7 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
       var active = n === idx;
       slide.classList.toggle('is-active', active);
       var video = slide.querySelector('video');
-      if (video) { active ? video.play().catch(function (e) { console.warn('carousel video play failed', e); }) : video.pause(); }
+      if (video) { active && onScreen ? video.play().catch(function (e) { console.warn('carousel video play failed', e); }) : video.pause(); }
     });
     dots.forEach(function (dot, n) { dot.classList.toggle('is-active', n === idx); });
   }
@@ -408,4 +509,11 @@ document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
   }
 
   show(0);
+
+  if (hasVideo && !onScreen) {
+    new IntersectionObserver(function (entries) {
+      onScreen = entries[0].isIntersecting;
+      show(idx);
+    }, { rootMargin: '200px 0px' }).observe(carousel);
+  }
 });

@@ -385,3 +385,38 @@ img { max-width: 100%; display: block; }
 .stockist-links { font-size: 12px; margin-left: 2px; }
 .stockist-links a { color: var(--clay); text-decoration: underline; }
 .stockist-links a:hover { color: var(--terracotta); }
+
+/* Cookie banner (assets/js/meta.js). Only appears once a Meta pixel ID is
+   set. Accept and Reject look exactly alike on purpose: the Spanish data
+   protection authority (AEPD) asks for rejecting to be as easy and as
+   visible as accepting. */
+.cookie-banner {
+  position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50;
+  max-width: 640px; margin: 0 auto; padding: 16px 18px;
+  background: var(--chalk); color: var(--navy);
+  border: 1px solid var(--sand); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(38,50,63,.18);
+  font-size: 13px; line-height: 1.5;
+}
+.cookie-banner p { margin: 0 0 12px; }
+.cookie-banner a { color: var(--clay); text-decoration: underline; }
+.cookie-actions { display: flex; gap: 10px; }
+.cookie-actions button {
+  flex: 1 1 0; padding: 10px 14px; border-radius: 6px; cursor: pointer;
+  font: 600 13px 'Inter', sans-serif;
+  background: var(--navy); color: var(--cream); border: 1px solid var(--navy);
+}
+.cookie-actions button:hover { background: var(--clay); border-color: var(--clay); }
+
+/* "Also available in English / castellano" bar (main.js) - replaces the old
+   automatic redirect by browser language, which Google advises against. */
+.lang-suggest {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 8px 16px; background: var(--navy); color: var(--cream);
+  font-size: 12.5px; text-align: center;
+}
+.lang-suggest a { color: var(--sand); font-weight: 600; text-decoration: underline; }
+.lang-suggest button {
+  background: none; border: none; color: var(--cream); cursor: pointer;
+  font-size: 18px; line-height: 1; padding: 0 4px;
+}
