@@ -285,10 +285,12 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
   }
 
-  // Same fields as the WhatsApp message, structured for the Worker's
-  // /send-order-emails endpoint (customer thank-you + business order alert
-  // via Resend). Sent best-effort - a failure here shouldn't block or alarm
-  // the customer, since WhatsApp is already the primary confirmation.
+  // The order as the Worker reads it. Only structured fields: the Worker
+  // computes the total and the pickup line itself and never trusts a
+  // total or a free-text summary coming from the browser. For card orders
+  // it is stored inside the Stripe session; for Bizum/cash it goes to
+  // /send-order-emails together with the Turnstile token. Emails are
+  // best-effort - WhatsApp is already the primary confirmation.
   function orderPayload(method, orderId) {
     return {
       orderId: orderId,
@@ -297,18 +299,29 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
       phone: phoneInput.value.trim(),
       email: emailInput.value.trim(),
       quantity: currentQty(),
-      deliverySummary: deliverySummary(),
-      total: formatPrice(currentTotal()),
+      delivery: isShipping() ? 'shipping' : 'pickup',
+      address: isShipping() ? addressInput.value.trim() : '',
+      pickupPoint: isShipping() ? '' : pickupSelect.value,
       paymentMethod: method
     };
   }
 
-  function sendOrderEmails(method, orderId) {
+  // Cloudflare Turnstile (anti-bot) token for Bizum/cash orders. The widget
+  // only shows itself when Cloudflare is unsure; a token is single-use, so
+  // it is reset right after being spent.
+  function turnstileToken() {
+    try { return (window.turnstile && window.turnstile.getResponse()) || ''; } catch (e) { return ''; }
+  }
+
+  function sendOrderEmails(method, orderId, token) {
+    var payload = orderPayload(method, orderId);
+    payload.turnstileToken = token;
     fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderPayload(method, orderId))
+      body: JSON.stringify(payload)
     }).catch(function (e) { console.warn('order email notification failed', e); });
+    try { if (window.turnstile) window.turnstile.reset(); } catch (e) { /* nothing to reset */ }
   }
 
   function showError(msg) {
@@ -348,17 +361,13 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
       // instead, once Stripe has actually redirected back after payment.
       sessionStorage.setItem('siuranaPendingOrder', JSON.stringify({
         whatsappText: buildWhatsappMessage('card'),
-        payload: orderPayload('card', orderId),
+        orderId: orderId,
         meta: { params: metaParams, buyer: buyer() }
       }));
       fetch(CHECKOUT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quantity: currentQty(),
-          delivery: isShipping() ? 'shipping' : 'pickup',
-          lang: isEnglish ? 'en' : 'es'
-        })
+        body: JSON.stringify(orderPayload('card', orderId))
       })
         .then(function (res) { return res.json(); })
         .then(function (data) {
@@ -380,8 +389,17 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
       return;
     }
 
+    var token = turnstileToken();
+    if (!token) {
+      // The anti-bot check hasn't finished (or needs a click): nothing has
+      // been sent yet, so the customer can simply try again in a moment.
+      submitBtn.disabled = false;
+      submitBtn.textContent = submitBtnDefaultText;
+      showError(isEnglish ? 'One moment - we are checking the connection. Please try again in a few seconds.' : 'Un momento: estamos verificando la conexión. Prueba de nuevo en unos segundos.');
+      return;
+    }
     openWhatsapp(method);
-    sendOrderEmails(method, orderId);
+    sendOrderEmails(method, orderId, token);
     // Bizum and cash orders count as a purchase when placed (the money
     // arrives later, by hand); payment_method keeps them apart from card
     // sales in Meta's reports.
@@ -443,16 +461,19 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
   // webhook) would also know, so Meta can keep just one of the two.
   if (pending.meta && meta) {
     var sessionId = new URLSearchParams(window.location.search).get('session_id');
-    var eventId = sessionId ? 'stripe-' + sessionId : 'order-' + (pending.payload && pending.payload.orderId);
+    var eventId = sessionId ? 'stripe-' + sessionId : 'order-' + pending.orderId;
     meta.identify(pending.meta.buyer || {});
     meta.track('Purchase', pending.meta.params, eventId);
   }
 
-  if (pending.payload) {
+  // The Worker only sends the emails if Stripe says this session is paid,
+  // and takes every detail from the session itself.
+  var paidSession = new URLSearchParams(window.location.search).get('session_id');
+  if (paidSession) {
     fetch(CHECKOUT_ENDPOINT + '/send-order-emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pending.payload)
+      body: JSON.stringify({ sessionId: paidSession })
     }).catch(function (e) { console.warn('order email notification failed', e); });
   }
 })();

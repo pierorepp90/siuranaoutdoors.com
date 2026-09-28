@@ -118,6 +118,7 @@
 
       <p class="order-total" aria-live="polite">Total: <strong id="order-total">8€</strong></p>
 
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFHWcdulpkmsGeOQ" data-appearance="interaction-only" data-action="order" data-language="es"></div>
       <button type="submit" class="btn-base" id="submit-order">Tramitar pedido</button>
       <p class="order-error" id="order-error" hidden></p>
       <p class="order-confirmation" id="order-confirmation" hidden></p>
@@ -131,6 +132,7 @@
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="/assets/js/meta.js"></script>
 <script src="/assets/js/main.js"></script>
 </body>
