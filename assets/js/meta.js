@@ -10,7 +10,7 @@
 // Debug: open any page with ?meta_debug=1 to log every event to the console
 // (and preview the banner) even without a pixel ID. The flag sticks for the
 // tab, so it survives the round-trip through Stripe; ?meta_debug=0 clears it.
-var SIURANA_PIXEL_ID = '';
+var SIURANA_PIXEL_ID = '2293412068139351';
 
 // Stable product label for every event. Audiences and custom conversions
 // get built on this string, so it must never change - renaming it silently

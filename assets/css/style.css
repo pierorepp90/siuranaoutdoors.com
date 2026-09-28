@@ -345,6 +345,20 @@ img { max-width: 100%; display: block; }
   text-align: center; padding: 24px 0; font-size: 12px;
 }
 .site-footer p { margin: 0; }
+.site-footer a { color: var(--cream); text-decoration: underline; }
+.site-footer a:hover { color: var(--sand); }
+
+/* Aviso legal y privacidad: el mismo ancho de lectura que el pedido. */
+.order.legal { max-width: 680px; padding-left: 16px; padding-right: 16px; }
+.legal .legal-h2 { font-size: 20px; margin: 30px 0 10px; }
+.legal a { color: var(--clay); text-decoration: underline; }
+.legal a:hover { color: var(--terracotta); }
+.legal-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 22px; }
+.legal-table th, .legal-table td { text-align: left; vertical-align: top; padding: 8px 6px; border-bottom: 1px solid var(--sand); }
+.legal-table th { font-weight: 600; }
+@media (max-width: 600px) {
+  .legal-table { display: block; overflow-x: auto; }
+}
 
 @media (max-width: 600px) {
   /* This used to need >= ~15px top padding to keep the crimp-hand header CTA's
