@@ -104,6 +104,8 @@ function formatEuros(cents, lang) {
 }
 
 function deliveryLine(order, lang) {
+  if (order.delivery === 'shipping' && !order.address) return lang === 'en' ? 'Shipping (address sent by WhatsApp)' : 'Envío (dirección enviada por WhatsApp)';
+  if (order.delivery !== 'shipping' && !PICKUP_POINTS[order.pickupPoint]) return lang === 'en' ? 'Pickup (point sent by WhatsApp)' : 'Recogida (punto enviado por WhatsApp)';
   if (order.delivery === 'shipping') return (lang === 'en' ? 'Ship to: ' : 'Envío a: ') + order.address;
   return (lang === 'en' ? 'Pickup at: ' : 'Recoger en: ') + order.pickupPoint + ' - ' + PICKUP_POINTS[order.pickupPoint];
 }
@@ -125,6 +127,14 @@ async function stripe(env, method, path, params) {
 
 async function handleCreateCheckoutSession(body, env, origin) {
   var read = readOrder(body);
+  // A page cached from before 28/09/2026 sends only quantity, delivery and
+  // lang. Starting a payment is harmless, so it still works; the session
+  // just carries no details, and the emails fall back to Stripe's own copy
+  // of the customer's email.
+  var legacy = !body.email && !body.name && read.errors.every(function (e) {
+    return e === 'email' || e === 'name' || e === 'phone' || e === 'address' || e === 'pickupPoint';
+  });
+  if (legacy) read.errors = [];
   if (read.errors.length) {
     return jsonResponse({ error: 'Invalid order', fields: read.errors }, 400, origin);
   }
@@ -139,7 +149,7 @@ async function handleCreateCheckoutSession(body, env, origin) {
   params.append('mode', 'payment');
   params.append('success_url', siteRoot + '/order-success/?session_id={CHECKOUT_SESSION_ID}');
   params.append('cancel_url', lang === 'en' ? siteBase + '/en/order/' : siteBase + '/pedido/');
-  params.append('customer_email', order.email);
+  if (order.email) params.append('customer_email', order.email);
   params.append('line_items[0][price_data][currency]', 'eur');
   params.append('line_items[0][price_data][product_data][name]',
     lang === 'en' ? 'Siurana Outdoors climbing chalk (250g)' : 'Magnesio Siurana Outdoors (250g)');
@@ -162,6 +172,7 @@ async function handleCreateCheckoutSession(body, env, origin) {
     address: order.address, pickup_point: order.pickupPoint
   };
   Object.keys(meta).forEach(function (k) {
+    if (legacy && k !== 'lang' && k !== 'quantity' && k !== 'delivery') return;
     params.append('metadata[' + k + ']', meta[k]);
     params.append('payment_intent_data[metadata][' + k + ']', meta[k]);
   });
