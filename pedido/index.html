@@ -82,7 +82,7 @@
         </label>
         <label class="radio-option">
           <input type="radio" name="delivery" id="delivery-pickup">
-          Recoger en nuestros puntos de venta
+          Comprar en nuestros puntos de venta
         </label>
 
         <div class="field" id="address-field">
@@ -91,14 +91,26 @@
         </div>
 
         <div class="field" id="pickup-field" hidden>
-          <label for="pickup-point">Punto de recogida*</label>
+          <label for="pickup-point">Punto de venta*</label>
           <select id="pickup-point">
             <option value="">Elige un punto</option>
             <option value="Gavà">Gavà</option>
             <option value="Barcelona (Poble Nou)">Barcelona (Poble Nou)</option>
           </select>
         </div>
+
+        <div class="store-map" id="store-map" hidden>
+          <a class="store-map-link" id="store-map-link" href="#" target="_blank" rel="noopener">
+            <img id="store-map-img" alt="" width="1040" height="700">
+          </a>
+          <p class="store-map-name" id="store-map-name"></p>
+          <p class="store-map-address" id="store-map-address"></p>
+          <p class="store-map-note">Pásate por la tienda y cómpralo allí.</p>
+          <a class="store-map-directions" id="store-map-directions" href="#" target="_blank" rel="noopener">Cómo llegar</a>
+        </div>
       </div>
+
+      <div id="checkout-part">
 
       <div class="order-block">
         <h2 class="section-title" style="font-size:16px;">Método de pago</h2>
@@ -110,10 +122,6 @@
           <input type="radio" name="payment" id="payment-bizum">
           Bizum
         </label>
-        <label class="radio-option">
-          <input type="radio" name="payment" id="payment-cash">
-          Efectivo (retiro en tienda)
-        </label>
       </div>
 
       <p class="order-total" aria-live="polite">Total: <strong id="order-total">8€</strong></p>
@@ -122,6 +130,7 @@
       <button type="submit" class="btn-base" id="submit-order">Tramitar pedido</button>
       <p class="order-error" id="order-error" hidden></p>
       <p class="order-confirmation" id="order-confirmation" hidden></p>
+      </div>
     </form>
   </div>
 </section>

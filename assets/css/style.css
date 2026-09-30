@@ -437,3 +437,21 @@ img { max-width: 100%; display: block; }
   background: none; border: none; color: var(--cream); cursor: pointer;
   font-size: 18px; line-height: 1; padding: 0 4px;
 }
+
+/* Stockist map on the order form: our own image, the whole map links to Google Maps. */
+.store-map { margin-top: 16px; }
+.store-map-link {
+  display: block; overflow: hidden; border-radius: 14px;
+  border: 1px solid var(--sand); background: var(--chalk);
+  aspect-ratio: 1040 / 700; transition: box-shadow .2s;
+}
+.store-map-link:hover { box-shadow: 0 8px 24px rgba(38, 50, 63, .15); }
+.store-map-link img { width: 100%; height: 100%; object-fit: cover; }
+.store-map-name { margin: 14px 0 0; font-family: 'Playfair Display', serif; font-size: 18px; }
+.store-map-address { margin: 4px 0 0; font-size: 14px; }
+.store-map-note { margin: 10px 0 0; font-size: 14px; opacity: .8; }
+.store-map-directions {
+  display: inline-block; margin-top: 12px; font-size: 14px; font-weight: 600;
+  color: var(--clay); text-decoration: underline;
+}
+.store-map-directions:hover { color: var(--terracotta); }

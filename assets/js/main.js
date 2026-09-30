@@ -122,10 +122,10 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
   var addressInput = document.getElementById('address');
   var pickupField = document.getElementById('pickup-field');
   var pickupSelect = document.getElementById('pickup-point');
+  var storeMap = document.getElementById('store-map');
+  var checkoutPart = document.getElementById('checkout-part');
 
-  var paymentCard = document.getElementById('payment-card');
   var paymentBizum = document.getElementById('payment-bizum');
-  var paymentCash = document.getElementById('payment-cash');
 
   var submitBtn = document.getElementById('submit-order');
   var submitBtnDefaultText = submitBtn.textContent;
@@ -157,6 +157,44 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     totalEl.textContent = formatPrice(currentTotal());
   }
 
+  // The stockists. Choosing one means buying it there in person, so the
+  // online checkout (payment, total, button) steps aside for a map of the
+  // shop. The map is our own image (OpenStreetMap tiles, pin drawn in),
+  // not an embedded Google Map: no third-party requests or cookies before
+  // the cookie banner, same as the Gede Studio site.
+  var PICKUP_LOCATIONS = {
+    'Gavà': {
+      url: 'https://maps.app.goo.gl/orKX2u5GM6163wHe7',
+      shop: 'Supermarket',
+      address: 'Rambla de Salvador Lluch, 5, 08850 Gavà',
+      img: '/assets/img/puntos/punto-gava.webp'
+    },
+    'Barcelona (Poble Nou)': {
+      url: 'https://maps.app.goo.gl/r31NURB6KiJb9p6s8',
+      shop: 'Raza Alimentació',
+      address: 'Carrer del Maresme, 130, 08019 Barcelona',
+      img: '/assets/img/puntos/punto-barcelona.webp'
+    }
+  };
+
+  function updateStoreMap() {
+    var loc = !isShipping() && PICKUP_LOCATIONS[pickupSelect.value];
+    storeMap.hidden = !loc;
+    checkoutPart.hidden = !!loc;
+    if (!loc) return;
+    var place = loc.shop + ', ' + loc.address;
+    var link = document.getElementById('store-map-link');
+    link.href = loc.url;
+    link.setAttribute('aria-label', isEnglish ? 'Open ' + loc.shop + ' in Google Maps' : 'Abrir ' + loc.shop + ' en Google Maps');
+    var img = document.getElementById('store-map-img');
+    img.src = loc.img;
+    img.alt = (isEnglish ? 'Map showing ' : 'Mapa con ') + place;
+    document.getElementById('store-map-name').textContent = loc.shop;
+    document.getElementById('store-map-address').textContent = loc.address;
+    document.getElementById('store-map-directions').href =
+      'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(place);
+  }
+
   function updateDeliveryFields() {
     if (isShipping()) {
       addressField.hidden = false;
@@ -169,20 +207,8 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
       pickupField.hidden = false;
       pickupSelect.required = true;
     }
+    updateStoreMap();
     updateTotal();
-  }
-
-  // Cash is pickup/in-person only - paying cash for a home delivery isn't
-  // an option, so shipping gets disabled (and forced over to pickup)
-  // whenever cash is selected, and re-enabled otherwise.
-  function updatePaymentConstraints() {
-    if (paymentCash.checked) {
-      deliveryShipping.disabled = true;
-      if (deliveryShipping.checked) deliveryPickup.checked = true;
-    } else {
-      deliveryShipping.disabled = false;
-    }
-    updateDeliveryFields();
   }
 
   qtyMinus.addEventListener('click', function () { qtyInput.value = currentQty() - 1; updateTotal(); });
@@ -190,10 +216,8 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
   qtyInput.addEventListener('input', updateTotal);
   deliveryShipping.addEventListener('change', updateDeliveryFields);
   deliveryPickup.addEventListener('change', updateDeliveryFields);
-  paymentCard.addEventListener('change', updatePaymentConstraints);
-  paymentBizum.addEventListener('change', updatePaymentConstraints);
-  paymentCash.addEventListener('change', updatePaymentConstraints);
-  updatePaymentConstraints();
+  pickupSelect.addEventListener('change', updateStoreMap);
+  updateDeliveryFields();
 
   if (meta) meta.track('InitiateCheckout', meta.productParams(1));
 
@@ -214,26 +238,8 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
 
   function currentPaymentMethod() {
     if (paymentBizum.checked) return 'bizum';
-    if (paymentCash.checked) return 'cash';
     return 'card';
   }
-
-  // One entry per pickup point: its maps link (matching the hrefs on the
-  // About-section stockist links - used to make the on-page confirmation's
-  // point name clickable) and, where we actually have one on file, a plain
-  // street address (used in the WhatsApp message text instead of the link -
-  // Gavà and Barcelona/Raza Alimentación only have coordinates/a business
-  // name on file, not a written address, so those two fall back to the link).
-  var PICKUP_LOCATIONS = {
-    'Gavà': {
-      url: 'https://www.google.com/maps/place/41%C2%B018\'13.2%22N+2%C2%B000\'35.6%22E/@41.3036579,2.0073166,17z/data=!3m1!4b1!4m4!3m3!8m2!3d41.3036579!4d2.0098915',
-      text: null
-    },
-    'Barcelona (Poble Nou)': {
-      url: 'https://www.google.com/maps/place/Raza+Alimentaci%C3%B3n/@41.4161977,2.2108011,17z/data=!3m1!4b1!4m6!3m5!1s0x12a4a34c379c5c1b:0xa8f54bc33366c0a!8m2!3d41.4161977!4d2.2108011!16s%2Fg%2F11cns7l4rz',
-      text: null
-    }
-  };
 
   function deliverySummary() {
     if (isShipping()) return (isEnglish ? 'Ship to: ' : 'Envío a: ') + addressInput.value.trim();
@@ -252,10 +258,8 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     var name = firstNameInput.value.trim() + ' ' + lastNameInput.value.trim();
     var paymentLine = isEnglish
       ? (method === 'bizum' ? 'Payment: Bizum (please confirm details)'
-        : method === 'cash' ? 'Payment: cash on pickup'
         : 'Payment: card (processing via Stripe)')
       : (method === 'bizum' ? 'Pago: Bizum (confirmar datos)'
-        : method === 'cash' ? 'Pago: efectivo al retirar'
         : 'Pago: tarjeta (procesando por Stripe)');
 
     var lines = isEnglish ? [
@@ -288,7 +292,7 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
   // The order as the Worker reads it. Only structured fields: the Worker
   // computes the total and the pickup line itself and never trusts a
   // total or a free-text summary coming from the browser. For card orders
-  // it is stored inside the Stripe session; for Bizum/cash it goes to
+  // it is stored inside the Stripe session; for Bizum it goes to
   // /send-order-emails together with the Turnstile token. Emails are
   // best-effort - WhatsApp is already the primary confirmation.
   function orderPayload(method, orderId) {
@@ -306,7 +310,7 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     };
   }
 
-  // Cloudflare Turnstile (anti-bot) token for Bizum/cash orders. The widget
+  // Cloudflare Turnstile (anti-bot) token for Bizum orders. The widget
   // only shows itself when Cloudflare is unsure; a token is single-use, so
   // it is reset right after being spent.
   function turnstileToken() {
@@ -335,6 +339,8 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     confirmationEl.hidden = true;
 
     if (!form.reportValidity()) return;
+    // A chosen stockist hides the button; this only guards against a stray Enter.
+    if (checkoutPart.hidden) return;
 
     var method = currentPaymentMethod();
     var orderId = newOrderId();
@@ -400,7 +406,7 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     }
     openWhatsapp(method);
     sendOrderEmails(method, orderId, token);
-    // Bizum and cash orders count as a purchase when placed (the money
+    // Bizum orders count as a purchase when placed (the money
     // arrives later, by hand); payment_method keeps them apart from card
     // sales in Meta's reports.
     if (meta) meta.track('Purchase', metaParams, 'order-' + orderId);
@@ -408,22 +414,9 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
     // "Enviando...") but stay disabled - the confirmation message below is
     // the intended next step, not a second submission of the same order.
     submitBtn.textContent = submitBtnDefaultText;
-    if (method === 'cash') {
-      var point = pickupSelect.value;
-      var pointUrl = PICKUP_LOCATIONS[point] && PICKUP_LOCATIONS[point].url;
-      // point comes from our own fixed <select> options, never free-typed
-      // user input, so building this HTML directly is safe.
-      var pointHtml = pointUrl
-        ? '<a href="' + pointUrl + '" target="_blank" rel="noopener">' + point + '</a>'
-        : point;
-      confirmationEl.innerHTML = isEnglish
-        ? 'Your order is ready to pick up whenever you\'d like, at ' + pointHtml + '.'
-        : 'Tu pedido está listo para recoger cuando quieras, en ' + pointHtml + '.';
-    } else {
-      confirmationEl.textContent = isEnglish
-        ? 'Order sent! We\'ll confirm Bizum payment details in the WhatsApp tab that just opened.'
-        : '¡Pedido enviado! Te vamos a confirmar el pago por Bizum en la pestaña de WhatsApp que se acaba de abrir.';
-    }
+    confirmationEl.textContent = isEnglish
+      ? 'Order sent! We\'ll confirm Bizum payment details in the WhatsApp tab that just opened.'
+      : '¡Pedido enviado! Te vamos a confirmar el pago por Bizum en la pestaña de WhatsApp que se acaba de abrir.';
     confirmationEl.hidden = false;
   });
 })();
