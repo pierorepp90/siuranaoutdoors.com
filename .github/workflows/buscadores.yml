@@ -10,11 +10,12 @@
 # Needs no secrets. It never changes the repository.
 name: Buscadores
 
+# Not `workflow_run` on "pages build and deployment": that one is GitHub's
+# built-in Pages workflow, it has no file in the repo, and workflow_run
+# never fires for it (checked on 14/10/2026, the first publish). So the
+# ping runs on the push to main and waits for Pages to finish instead.
 on:
   push:
-  workflow_run:
-    workflows: ["pages build and deployment"]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -34,16 +35,15 @@ jobs:
   avisar-buscadores:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # GitHub Pages sits behind Cloudflare and a CDN cache: give the new
-      # version a moment to be the one that answers.
-      - run: sleep 60
+      # Pages takes about a minute to build and publish, and it sits behind
+      # Cloudflare and a CDN cache: give the new version time to be the one
+      # that answers.
+      - run: sleep 150
       - run: node .github/scripts/avisar-buscadores.mjs
