@@ -1,0 +1,49 @@
+# Search engines and AI assistants (ChatGPT, Claude, Perplexity...).
+#
+# - On every push, to any branch: llms.txt must match the pages it is
+#   built from (.github/scripts/llms.mjs --check). A red cross here means
+#   "run `node .github/scripts/llms.mjs` and commit llms.txt".
+# - After GitHub Pages publishes main: request the live home page as each
+#   AI crawler (fails if Cloudflare blocks one) and ping IndexNow so Bing
+#   picks up the changes the same day (.github/scripts/avisar-buscadores.mjs).
+#
+# Needs no secrets. It never changes the repository.
+name: Buscadores
+
+on:
+  push:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  llms-al-dia:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node .github/scripts/llms.mjs --check
+
+  avisar-buscadores:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # GitHub Pages sits behind Cloudflare and a CDN cache: give the new
+      # version a moment to be the one that answers.
+      - run: sleep 60
+      - run: node .github/scripts/avisar-buscadores.mjs

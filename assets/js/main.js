@@ -306,7 +306,10 @@ document.querySelectorAll('.site-header .icon-link').forEach(function (link) {
       delivery: isShipping() ? 'shipping' : 'pickup',
       address: isShipping() ? addressInput.value.trim() : '',
       pickupPoint: isShipping() ? '' : pickupSelect.value,
-      paymentMethod: method
+      paymentMethod: method,
+      // Where the customer came from (origin.js): shown to the owner in the
+      // order email, never to the customer. The Worker re-cleans it.
+      origin: (window.siuranaOrigin && window.siuranaOrigin.current()) || ''
     };
   }
 

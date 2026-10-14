@@ -188,5 +188,9 @@ window.siuranaMeta = (function () {
     log('pixel', SIURANA_PIXEL_ID || '(not set)', '| consent', consent, '| local', isLocal);
   });
 
-  return { track: track, identify: identify, productParams: productParams, resetConsent: resetConsent };
+  // origin.js only remembers where a visitor came from after they accepted,
+  // the same rule as the pixel.
+  function hasConsent() { return readConsent() === 'granted'; }
+
+  return { track: track, identify: identify, productParams: productParams, resetConsent: resetConsent, hasConsent: hasConsent };
 })();

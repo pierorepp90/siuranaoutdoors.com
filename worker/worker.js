@@ -70,6 +70,23 @@ function hasLink(s) {
   return /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|ru|xyz|info|top|io|link|click)\b)/i.test(s);
 }
 
+// Where the customer came from, as sent by assets/js/origin.js:
+// "utm_source=chatgpt.com" or "utm_source=perplexity.ai&utm_medium=ia".
+// Only the five standard utm_ tags survive, short and without odd
+// characters - it comes from the browser, so anyone can write it. It only
+// ever goes to the owner (order email, Stripe metadata), never to the
+// customer.
+var ORIGIN_TAGS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+function cleanOrigin(value) {
+  var params = new URLSearchParams(String(value == null ? '' : value).slice(0, 1000));
+  var out = new URLSearchParams();
+  ORIGIN_TAGS.forEach(function (tag) {
+    var v = String(params.get(tag) || '').replace(/[^\w .\-|/+]/g, '').trim().slice(0, 80);
+    if (v) out.set(tag, v);
+  });
+  return out.toString().slice(0, 300);
+}
+
 function readOrder(body) {
   var order = {
     orderId: cleanText(body.orderId, 40),
@@ -80,7 +97,8 @@ function readOrder(body) {
     quantity: parseInt(body.quantity, 10),
     delivery: body.delivery === 'shipping' ? 'shipping' : 'pickup',
     address: cleanText(body.address, 300),
-    pickupPoint: cleanText(body.pickupPoint, 60)
+    pickupPoint: cleanText(body.pickupPoint, 60),
+    origin: cleanOrigin(body.origin)
   };
   var errors = [];
   if (!Number.isInteger(order.quantity) || order.quantity < 1 || order.quantity > 10) errors.push('quantity');
@@ -169,10 +187,11 @@ async function handleCreateCheckoutSession(body, env, origin) {
   var meta = {
     order_id: order.orderId, lang: lang, name: order.name, phone: order.phone,
     email: order.email, quantity: String(order.quantity), delivery: order.delivery,
-    address: order.address, pickup_point: order.pickupPoint
+    address: order.address, pickup_point: order.pickupPoint, origin: order.origin
   };
   Object.keys(meta).forEach(function (k) {
     if (legacy && k !== 'lang' && k !== 'quantity' && k !== 'delivery') return;
+    if (!meta[k] && k === 'origin') return; // most orders have none: no empty field in Stripe
     params.append('metadata[' + k + ']', meta[k]);
     params.append('payment_intent_data[metadata][' + k + ']', meta[k]);
   });
@@ -279,7 +298,8 @@ async function sendOrderEmails(env, order, method, total) {
     + escapeHtml(deliveryLine(order, 'es')) + '<br>'
     + 'Total: ' + escapeHtml(total) + '<br>'
     + 'Pago: ' + escapeHtml(paymentMethod)
-    + (order.orderId ? '<br>Pedido: ' + escapeHtml(order.orderId) : '') + '</p>'
+    + (order.orderId ? '<br>Pedido: ' + escapeHtml(order.orderId) : '')
+    + (order.origin ? '<br>Origen: ' + escapeHtml(order.origin) : '') + '</p>'
     + '</div>';
 
   var results = await Promise.all([
@@ -325,7 +345,8 @@ async function handleCardEmails(body, env, origin) {
     quantity: parseInt(m.quantity, 10) || 0,
     delivery: m.delivery === 'shipping' ? 'shipping' : 'pickup',
     address: m.address || '',
-    pickupPoint: PICKUP_POINTS[m.pickup_point] ? m.pickup_point : ''
+    pickupPoint: PICKUP_POINTS[m.pickup_point] ? m.pickup_point : '',
+    origin: cleanOrigin(m.origin)
   };
   if (!order.email) return jsonResponse({ error: 'Session without email' }, 422, origin);
 
